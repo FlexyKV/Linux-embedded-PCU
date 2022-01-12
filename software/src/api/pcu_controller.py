@@ -1,32 +1,38 @@
 import json
-from flask import Blueprint, request
+from flask import Blueprint, request, Flask, jsonify
+
+app = Flask(__name__)
 
 
-bp = Blueprint('pcu', __name__, url_prefix='/')
-
-
-@bp.route('', methods=['GET'])
+@app.route('/pcu', methods=['POST'])
 def test():
-    return 'empty.'
+    response = {
+        "status": 200
+    }
+    return jsonify(response)
 
 
-@bp.route('/ports', methods=['PUT'])
+@app.route('/ports', methods=['PUT'])
 def put_port_control():
     payload = json.loads(request.get_data())
     return 'empty.'
 
 
-@bp.route('/events', methods=['GET'])
+@app.route('/events', methods=['GET'])
 def get_events():
     payload = json.loads(request.get_data())
     return 'empty.'
 
 
-@bp.route('/ports', methods=['GET'])
+@app.route('/ports', methods=['GET'])
 def get_ports_states():
     return 'empty.'
 
 
-@bp.route('/ports/power', methods=['GET'])
+@app.route('/ports/power', methods=['GET'])
 def get_ports_powers():
     return 'empty.'
+
+
+if __name__ == "__main__":
+    app.run(host='localhost', port=8989)

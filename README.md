@@ -33,4 +33,17 @@ description
 
 image
 
-### others #TODO
+### How to use project
+
+(temp)
+connect ssh:
+
+```
+ssh pi@raspberry.local 
+```
+
+(temp) sync file:
+
+```
+scp src/api/pcu_controller.py pi@raspberry.local:/home/pi
+```
