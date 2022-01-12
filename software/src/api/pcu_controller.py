@@ -7,7 +7,8 @@ app = Flask(__name__)
 @app.route('/pcu', methods=['POST'])
 def test():
     response = {
-        "status": 200
+        "status": 200,
+        "test": "watever"
     }
     return jsonify(response)
 
@@ -35,4 +36,4 @@ def get_ports_powers():
 
 
 if __name__ == "__main__":
-    app.run(host='localhost', port=8989)
+    app.run(host='0.0.0.0', port=8989)
