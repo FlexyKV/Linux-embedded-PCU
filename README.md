@@ -46,4 +46,5 @@ ssh pi@raspberry.local
 
 ```
 scp src/api/pcu_controller.py pi@raspberry.local:/home/pi
+scp -r pcu pi@pcu.local:/home/pi
 ```

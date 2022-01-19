@@ -1,5 +1,5 @@
 import json
-from flask import Blueprint, request, Flask, jsonify
+from flask import request, Flask, jsonify
 
 app = Flask(__name__)
 
@@ -8,7 +8,7 @@ app = Flask(__name__)
 def test():
     response = {
         "status": 200,
-        "test": "watever"
+        "test": "test122223"
     }
     return jsonify(response)
 
