@@ -1,5 +1,6 @@
 import Adafruit_GPIO.GPIO as GPIO
 import Adafruit_GPIO.SPI as SPI
+import time
 
 
 class MCP3008(object):
@@ -19,7 +20,7 @@ class MCP3008(object):
             self._spi = SPI.BitBang(gpio, clk, mosi, miso, cs)
         else:
             raise ValueError('Must specify either spi for for hardware SPI or clk, cs, miso, and mosi for software SPI!')
-        self._spi.set_clock_hz(1000000)
+        self._spi.set_clock_hz(36000000)
         self._spi.set_mode(0)
         self._spi.set_bit_order(SPI.MSBFIRST)
 
@@ -52,18 +53,22 @@ mcp0 = MCP3008(spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE_0))
 mcp1 = MCP3008(spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE_1))
 counter =1
 
-
+start_time = time.time()
 while (1):
     # Read all the ADC channel values in a list.
+    values0 = [0] * 8
+    values1 = [0] * 8
+
     for i in range(8):
-        values0 = [0]*8
-        values1 = [0]*8
         # The read_adc function will get the value of the specified channel (0-7).
-        values0[i] = (mcp0.read_adc(i)/1023)*5.0
-        values1[i] = (mcp1.read_adc(i)/1023)*5.0
+        values0[i] = (mcp0.read_adc(i)/1023)*5.3
+        values1[i] = (mcp1.read_adc(i)/1023)*5.3
     # Print the ADC values.
-    print('ADC 0 | {0:>4} | {1:>4} | {2:>4} | {3:>4} | {4:>4} | {5:>4} | {6:>4} | {7:>4} |'.format(*values0))
-    print('ADC 1 | {0:>4} | {1:>4} | {2:>4} | {3:>4} | {4:>4} | {5:>4} | {6:>4} | {7:>4} |'.format(*values1))
-    print("---------------------------------------------------------------")
+    print(values0)
+    print(values1)
+   # print('ADC 0 | {0:>4} | {1:>4} | {2:>4} | {3:>4} | {4:>4} | {5:>4} | {6:>4} | {7:>4} |'.format(*values0))
+   # print('ADC 1 | {0:>4} | {1:>4} | {2:>4} | {3:>4} | {4:>4} | {5:>4} | {6:>4} | {7:>4} |'.format(*values1))
+    # print("---------------------------------------------------------------")
     counter +=1
     print(counter)
+    print("--- %s seconds ---" % (time.time() - start_time))
