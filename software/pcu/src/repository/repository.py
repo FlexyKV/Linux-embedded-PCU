@@ -1,5 +1,6 @@
 import sqlite3
 from sqlite3 import Error
+import datetime
 
 db_file_path = r"pythonsqlitetest.db"
 
@@ -11,12 +12,68 @@ delete_all_command = "DELETE FROM {table}"
 delete_id_command = "DELETE FROM {table} WHERE id={id}"
 
 
-class Repository:
+class PcuRepository:
     def __init__(self, dbfile):
         self.dbfile = dbfile
         self.conn = None
 
-    def create_connexion(self):
+    def insert_pcu_port_measures(self, port_number: int, start_time: datetime, period: int,
+                                 current: float, voltage: float):
+        self.conn = self.open_connection()
+
+        record_id = self.insert("record", ["NULL", start_time, period])
+
+        port_id = self.__get_port(port_number)
+
+        measure_id = self.insert("measures", ["NULL", record_id, port_id, current, voltage])
+
+        self.conn.close()
+        return measure_id
+
+    def get_pcu_port_measures(self, port_number: int, start_time: datetime, end_time: datetime, period: int):
+        self.conn = self.open_connection()
+
+        record_ids = self.__get_records(start_time, end_time, period)
+
+        port_id = self.__get_port(port_number)
+
+        measures = self.__get_measures(port_id, record_ids)
+
+        self.conn.close()
+        return measures
+
+    def __get_measures(self, port_id: int, record_ids: list):
+
+        cur = self.conn.cursor()
+        get_measures = """SELECT current, voltage FROM measures WHERE record_id IN ({records})
+         AND port_id = ? """.format(records=','.join(['?'] * len(record_ids)))
+
+        query_args = record_ids.append(port_id)
+
+        cur.execute(get_measures, query_args)
+        measures = cur.fetchone()
+
+        self.conn.commit()
+        return measures
+
+    def __get_records(self, start_time: datetime, end_time: datetime, period: int):
+        cur = self.conn.cursor()
+        get_timeframe_query = """SELECT id FROM record WHERE start >= ? AND start < ? AND period = ?"""
+        cur.execute(get_timeframe_query, [start_time, end_time, period])
+        record_ids = cur.fetchone()
+        self.conn.commit()
+        return record_ids
+
+    def __get_port(self, port_number: int):
+        cur = self.conn.cursor()
+        get_port_query = """SELECT id FROM ports WHERE port_number = ?"""
+        cur.execute(get_port_query, [port_number])
+        port_id = cur.fetchone()
+        self.conn.commit()
+        self.conn.close()
+        return port_id
+
+    def open_connection(self):
         try:
             self.conn = sqlite3.connect(self.dbfile)
         except Error as e:
@@ -114,7 +171,6 @@ def create_table(connection):
     sql_create_record = """CREATE TABLE "record" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "start" DATETIME NOT NULL,
-    "end" DATETIME NOT NULL,
     "period" INTEGER NOT NULL
     );"""
 
@@ -145,19 +201,19 @@ def create_table(connection):
 
 if __name__ == '__main__':
 
-    #test working
-    repo = Repository(db_file_path)
-    conn = repo.create_connexion()
+    # test working
+    repo = PcuRepository(db_file_path)
+    conn = repo.open_connection()
     if not conn:
         print("database connexion error")
     create_table(conn)
 
     # manual insert
-    #insert_command = """INSERT INTO port (id, port_number, port_state) VALUES (NULL, 5, 1);"""
-    #cur = conn.cursor()
+    # insert_command = """INSERT INTO port (id, port_number, port_state) VALUES (NULL, 5, 1);"""
+    # cur = conn.cursor()
     # cur.execute(insert_command)
     # conn.commit()
 
     # function insert
-    repo.insert("port", ["NULL", 6, 0])
-
+    val = repo.insert("port", ["NULL", 7, 0])
+    print(val)
