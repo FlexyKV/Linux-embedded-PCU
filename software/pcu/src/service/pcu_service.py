@@ -1,5 +1,5 @@
 import json
-from software.pcu.src.repository.repository import PcuRepository
+from software.pcu.src.repository.pcu_repository import PcuRepository
 import datetime
 
 class PcuService:
