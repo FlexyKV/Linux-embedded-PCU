@@ -10,8 +10,7 @@ class PcuRepository:
 
     def open_connection(self):
         try:
-            self.conn = sqlite3.connect(self.db)
-            self.conn.row_factory = lambda cursor, row: row[0] #TODO change this system
+            self.conn = sqlite3.connect(self.db, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
         except Error as e:
             print(e)
             return -1
@@ -20,30 +19,18 @@ class PcuRepository:
     def close_connexion(self):
         self.conn.close()
 
-    def __get_record_id(self, record_datetime: datetime, record_period: int):
+    def __get_records(self, start_time: datetime, end_time: datetime, record_period: int):
         try:
             cur = self.conn.cursor()
-            get_timeframe_query = """SELECT id FROM record WHERE record_datetime = ? AND record_period = ?"""
-            cur.execute(get_timeframe_query, [record_datetime, record_period])
-            record_id = cur.fetchone()
-            self.conn.commit()
-        except Error as e:
-            print(e)
-            return -1
-        return record_id
-
-    def __get_period_record_ids(self, start_time: datetime, end_time: datetime, record_period: int):
-        try:
-            cur = self.conn.cursor()
-            get_timeframe_query = """SELECT id FROM record WHERE record_datetime >= ? AND record_datetime < ? 
-            AND record_period = ?"""
+            get_timeframe_query = """SELECT id, record_datetime as "[timestamp]" FROM record WHERE record_datetime >= ? 
+            AND record_datetime < ? AND record_period = ?"""
             cur.execute(get_timeframe_query, [start_time, end_time, record_period])
-            record_ids = cur.fetchall()
+            records = cur.fetchall()
             self.conn.commit()
         except Error as e:
             print(e)
             return -1
-        return record_ids
+        return records
 
     def __insert_record(self, record_datetime: datetime, period: int):
         try:
@@ -82,6 +69,7 @@ class PcuRepository:
         return cur.lastrowid
 
     def get_port_state(self, port_id: int):
+        self.open_connection()
         try:
             cur = self.conn.cursor()
             get_port_query = """SELECT port_state FROM port WHERE id = ?"""
@@ -91,18 +79,24 @@ class PcuRepository:
         except Error as e:
             print(e)
             return -1
-        return port_state
+        self.close_connexion()
+        return port_state[0]
 
     def update_port_state(self, port_id: int, port_state: int):
+        self.open_connection()
         try:
             cur = self.conn.cursor()
             get_port_query = """UPDATE port SET port_state = ? WHERE id = ?"""
             cur.execute(get_port_query, [port_state, port_id])
+            get_port_query = """SELECT port_state FROM port WHERE id = ?"""
+            cur.execute(get_port_query, [port_id])
+            new_port_state = cur.fetchone()
             self.conn.commit()
         except Error as e:
             print(e)
             return -1
-        return port_id
+        self.close_connexion()
+        return new_port_state[0]
 
     def insert_port_measures(self, record_datetime: datetime, record_period: int,
                              current: list, voltage: list):
@@ -116,11 +110,18 @@ class PcuRepository:
 
     def get_port_measures(self, port_id: int, start_time: datetime, end_time: datetime, period: int):
 
-        record_ids = self.__get_period_record_ids(start_time, end_time, period)
+        self.open_connection()
+
+        records = self.__get_records(start_time, end_time, period)
+        record_ids = list(map(lambda r_id: r_id[0], records))
+        record_datetime = list(map(lambda dt: dt[1], records))
 
         measures = self.__get_measures(port_id, record_ids)
+        measure_records = list(zip(record_datetime, measures))
 
-        return measures
+        self.close_connexion()
+
+        return measure_records
 
     def create_ports(self):
         if self.get_port_state(2) is None:
@@ -167,4 +168,3 @@ class PcuRepository:
         except Error as e:
             print(e)
             return -1
-
