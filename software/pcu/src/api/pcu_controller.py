@@ -8,6 +8,8 @@ db_file_path = r"C:\Users\FlexyFlex\PycharmProjects\Linux-embeded-PCU\software\p
 
 pcu_repository = PcuRepository(db_file_path)
 pcu_service = PcuService(pcu_repository)
+pcu_repository.create_tables()
+pcu_repository.create_tables()
 
 
 @app.route('/pcu', methods=['POST'])

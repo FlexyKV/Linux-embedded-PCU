@@ -1,5 +1,6 @@
 from software.pcu.src.repository.pcu_repository import PcuRepository
 from software.pcu.src.service.mapper import port_measure_mapper, port_state_mapper, str_to_datetime
+import json
 
 
 class PcuService:
@@ -8,6 +9,8 @@ class PcuService:
 
     def get_port_measures(self, port_id: int, start_time: str, end_time: str, period: int):
         measures = self.repository.get_port_measures(port_id, str_to_datetime(start_time), str_to_datetime(end_time), period)
+        if measures == -1:
+            return json.dumps({"error": "no data"})
         return port_measure_mapper(measures)
 
     def get_port_state(self, port_id: int):

@@ -7,11 +7,13 @@ def port_measure_mapper(measures: list) -> json:
     currents = list(map(lambda current: current[1][0], measures))
     voltages = list(map(lambda voltage: voltage[1][1], measures))
     powers = list(map(lambda power: power[1][0] * power[1][1], measures))
+    port_state = list(map(lambda ps: ps[2], measures))
 
     """find total number of seconds in time range to identify seconds not found, handle in javascript ?"""
     # time = (end_time - start_time).total_seconds()
 
-    port_measures = {"timestamp": timestamp, "current": currents, "voltage": voltages, "power": powers}
+    port_measures = {"timestamp": timestamp, "port_state": port_state, "current": currents, "voltage": voltages,
+                     "power": powers}
 
     return json.dumps(port_measures)
 

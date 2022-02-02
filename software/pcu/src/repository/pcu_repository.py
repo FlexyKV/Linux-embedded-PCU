@@ -22,8 +22,8 @@ class PcuRepository:
     def __get_records(self, start_time: datetime, end_time: datetime, record_period: int):
         try:
             cur = self.conn.cursor()
-            get_timeframe_query = """SELECT id, record_datetime as "[timestamp]" FROM record WHERE record_datetime >= ? 
-            AND record_datetime < ? AND record_period = ?"""
+            get_timeframe_query = """SELECT id, record_datetime as "[timestamp]", record_port_states FROM record 
+            WHERE record_datetime >= ? AND record_datetime < ? AND record_period = ?"""
             cur.execute(get_timeframe_query, [start_time, end_time, record_period])
             records = cur.fetchall()
             self.conn.commit()
@@ -35,8 +35,14 @@ class PcuRepository:
     def __insert_record(self, record_datetime: datetime, period: int):
         try:
             cur = self.conn.cursor()
-            insert_record_query = """INSERT INTO record VALUES (NULL, ?, ?)"""
-            cur.execute(insert_record_query, [record_datetime, period])
+            get_states_query = """SELECT port_state FROM port"""
+            cur.execute(get_states_query)
+            port_states = list(map(lambda st: st[0], cur.fetchall()))
+            int_state = 0
+            for state in port_states:
+                int_state = (int_state << 1) | state
+            insert_record_query = """INSERT INTO record VALUES (NULL, ?, ?, ?)"""
+            cur.execute(insert_record_query, [record_datetime, period, int_state])
             self.conn.commit()
         except Error as e:
             print(e)
@@ -80,6 +86,8 @@ class PcuRepository:
             print(e)
             return -1
         self.close_connexion()
+        if port_state is None:
+            return port_state
         return port_state[0]
 
     def update_port_state(self, port_id: int, port_state: int):
@@ -101,11 +109,12 @@ class PcuRepository:
     def insert_port_measures(self, record_datetime: datetime, record_period: int,
                              current: list, voltage: list):
 
+        self.open_connection()
         record_id = self.__insert_record(record_datetime, record_period)
         measure_ids = []
         for port_id in range(8):
             measure_ids.append(self.__insert_measure(record_id, port_id, current[port_id], voltage[port_id]))
-
+        self.close_connexion()
         return measure_ids
 
     def get_port_measures(self, port_id: int, start_time: datetime, end_time: datetime, period: int):
@@ -115,16 +124,29 @@ class PcuRepository:
         records = self.__get_records(start_time, end_time, period)
         record_ids = list(map(lambda r_id: r_id[0], records))
         record_datetime = list(map(lambda dt: dt[1], records))
+        record_ports_states = list(map(lambda st: st[2], records))
+        record_port_states = []
+
+        # get port state from list of states
+        for record_states in record_ports_states:
+            record_binary_states = [1 if digit == '1' else 0 for digit in bin(record_states)[2:]]
+            while len(record_binary_states) < 8:
+                record_binary_states.insert(0, 0)
+            port_id_record_state = int(record_binary_states[port_id])
+            record_port_states.append(port_id_record_state)
 
         measures = self.__get_measures(port_id, record_ids)
-        measure_records = list(zip(record_datetime, measures))
-
         self.close_connexion()
 
+        if not records:
+            return -1
+
+        measure_records = list(zip(record_datetime, measures, record_port_states))
         return measure_records
 
     def create_ports(self):
         if self.get_port_state(2) is None:
+            self.open_connection()
             try:
                 new_port_query = "INSERT INTO port VALUES (?, 0)"
                 for port in range(8):
@@ -134,14 +156,19 @@ class PcuRepository:
             except Error as e:
                 print(e)
                 return -1
+        self.close_connexion()
+        return 0
 
     def create_tables(self):
         """create tables"""
 
+        self.open_connection()
+
         sql_create_record = """CREATE TABLE IF NOT EXISTS "record" (
         "id" INTEGER NOT NULL PRIMARY KEY,
         "record_datetime" DATETIME NOT NULL,
-        "record_period" INTEGER NOT NULL
+        "record_period" INTEGER NOT NULL,
+        "record_port_states" INTEGER NOT NULL
         );"""
 
         sql_create_port = """CREATE TABLE IF NOT EXISTS "port" (
@@ -168,3 +195,6 @@ class PcuRepository:
         except Error as e:
             print(e)
             return -1
+
+        self.close_connexion()
+        return 0
