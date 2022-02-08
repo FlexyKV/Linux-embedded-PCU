@@ -12,7 +12,7 @@ simulator = ADCSimulator(repo)
 
 simulator.init_repository()
 old_time = datetime.now()
-simulator.launch_simulation(5)
+simulator.launch_simulation(2)
 
 
 # repo.open_connection()

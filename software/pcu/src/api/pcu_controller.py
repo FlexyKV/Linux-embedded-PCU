@@ -1,15 +1,24 @@
 import json
+import datetime
+import threading
 from flask import request, Flask, jsonify
 from software.pcu.src.service.pcu_service import PcuService
 from software.pcu.src.repository.pcu_repository import PcuRepository
+from software.pcu.src.adc.adc_simulator import ADCSimulator
 
 app = Flask(__name__)
 db_file_path = r"C:\Users\FlexyFlex\PycharmProjects\Linux-embeded-PCU\software\pcu\PCUDB"
 
-pcu_repository = PcuRepository(db_file_path)
-pcu_service = PcuService(pcu_repository)
-pcu_repository.create_tables()
-pcu_repository.create_tables()
+pcu_service_repo = PcuRepository(db_file_path)
+pcu_service_repo.create_tables()
+pcu_service_repo.create_ports()
+
+pcu_service = PcuService(pcu_service_repo)
+
+# pcu_adc_repo = PcuRepository(db_file_path)
+# pcu_adc = ADCSimulator(pcu_adc_repo)
+# adc_thread = threading.Thread(target=pcu_adc.launch_simulation, args=(5,))
+# adc_thread.start()
 
 
 @app.route('/pcu', methods=['POST'])

@@ -8,7 +8,8 @@ class PcuService:
         self.repository = repository
 
     def get_port_measures(self, port_id: int, start_time: str, end_time: str, period: int):
-        measures = self.repository.get_port_measures(port_id, str_to_datetime(start_time), str_to_datetime(end_time), period)
+        measures = self.repository.get_port_measures(port_id, str_to_datetime(start_time), str_to_datetime(end_time),
+                                                     period)
         if measures == -1:
             return json.dumps({"error": "no data"})
         return port_measure_mapper(measures)

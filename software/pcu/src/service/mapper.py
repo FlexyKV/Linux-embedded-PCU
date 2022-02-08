@@ -3,17 +3,17 @@ from datetime import datetime
 
 
 def port_measure_mapper(measures: list) -> json:
-    timestamp = list(map(lambda dt: datetime_to_str(dt[0]), measures))
-    currents = list(map(lambda current: current[1][0], measures))
-    voltages = list(map(lambda voltage: voltage[1][1], measures))
-    powers = list(map(lambda power: power[1][0] * power[1][1], measures))
-    port_state = list(map(lambda ps: ps[2], measures))
+    datetimes = list(map(lambda dt: datetime_to_str(dt), measures[0]))
+    currents = measures[1]
+    voltages = measures[2]
+    powers = [current * voltage for current, voltage in zip(currents, voltages)]
+    port_states = list(map(lambda ps: (datetime_to_str(ps[0]), ps[1]), measures[3]))
 
     """find total number of seconds in time range to identify seconds not found, handle in javascript ?"""
     # time = (end_time - start_time).total_seconds()
 
-    port_measures = {"timestamp": timestamp, "port_state": port_state, "current": currents, "voltage": voltages,
-                     "power": powers}
+    port_measures = {"datetime": datetimes, "current": currents, "voltage": voltages,
+                     "power": powers, "port_states": port_states}
 
     return json.dumps(port_measures)
 
