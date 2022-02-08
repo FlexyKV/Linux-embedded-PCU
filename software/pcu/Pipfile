@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 flask = "*"
 Adafruit_GPIO = "*"
+matplotlib = "*"
+
 
 [requires]
 python_version = "3"
