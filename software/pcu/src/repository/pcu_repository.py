@@ -116,7 +116,7 @@ class PcuRepository:
         self.close_connexion()
         return measure_ids
 
-    def get_port_measures(self, port_id: int, start_time: datetime, end_time: datetime, period: int):
+    def get_port_measures(self, port_id: int, start_time: datetime, end_time: datetime):
 
         self.open_connection()
 
@@ -141,109 +141,8 @@ class PcuRepository:
         if not records:
             return -1
 
-        # return self.create_measures_without_holes(record_datetime, measures, record_port_states, period)
-        return self.create_measures_with_holes(record_datetime, measures, record_port_states, period)
+        return record_datetime, record_port_states, measures
 
-    def create_measures_without_holes(self, record_datetime, measures, record_port_states, period):
-
-        # kinda works with periods, but kinda shit too
-        period_port_states = [(record_datetime[0], record_port_states[0])]
-        period_datetimes = []
-        currents = []
-        voltages = []
-        period_seconds, record_current, record_voltage, missing_records, measured_record = 0, 0, 0, 0, 0
-
-        for record_index in range(len(measures)):
-
-            record_timedelta = timedelta(0)
-            # if this is not the last record in the record, calculate number of seconds until next record
-            if record_index != len(record_datetime) - 1:
-                record_timedelta = record_datetime[record_index + 1] - record_datetime[record_index]
-
-            # if next record > 1.5 second, set as missing record
-            # print(record_timedelta.total_seconds())
-            if record_timedelta.total_seconds() > 1.5:
-                nb_lost_period = 0
-                for undefined_second in range(int(record_timedelta.total_seconds())):
-                    missing_records += 1
-                    period_seconds += 1
-                    if period_seconds == period:
-                        print(record_index)
-                        print("miss all")
-                        period_datetimes.append(record_datetime[record_index - measured_record] +
-                                                timedelta(0, nb_lost_period * period))
-                        currents.append(-1)
-                        voltages.append(-1)
-                        period_seconds, record_current, record_voltage, missing_records, measured_record = 0, 0, 0, 0, 0
-                        nb_lost_period += 1
-
-            # if next record is nex second, average period measures
-            else:
-                # print(record_index)
-                # print(measures[record_index][0])
-                measured_record += 1
-                record_current += measures[record_index][0]
-                record_voltage += measures[record_index][1]
-
-                # if port state change during record, add to list
-                if record_port_states[record_index] != period_port_states[-1][1]:
-                    period_port_states.append((record_datetime[record_index], record_port_states[record_index]))
-
-                period_seconds += 1
-
-                if period_seconds == period:
-                    if missing_records:
-                        print(record_index)
-                        print("miss some")
-                        period_datetimes.append(period_datetimes.append(record_datetime[record_index - period_seconds
-                                                                                        + missing_records + 1]))
-                        currents.append(-1)
-                        voltages.append(-1)
-                    else:
-                        print(record_index)
-                        print("find")
-                        period_datetimes.append(record_datetime[record_index - period_seconds + 1])
-                        currents.append(record_current / period_seconds)
-                        voltages.append(record_voltage / period_seconds)
-                    period_seconds, record_current, record_voltage, missing_records, measured_record = 0, 0, 0, 0, 0
-
-        measure_records = [period_datetimes, currents, voltages, period_port_states]
-        print(measure_records)
-
-        return measure_records
-
-
-    def create_measures_with_holes(self, record_datetime, measures, record_port_states, period):
-
-        # so valid values only with period = 1, with other periods, doesn't consider the dates but index to do avg
-
-        period_port_states = [(record_datetime[0], record_port_states[0])]
-        period_datetimes = []
-        currents = []
-        voltages = []
-        period_seconds, record_current, record_voltage, missing_records = 0, 0, 0, 0
-        for record_index in range(len(record_datetime)):
-            record_current += measures[record_index][0]
-            record_voltage += measures[record_index][1]
-
-            if record_port_states[record_index] != period_port_states[-1][1]:
-                period_port_states.append((record_datetime[record_index], record_port_states[record_index]))
-
-            period_seconds += 1
-
-            if period_seconds == period:
-                period_datetimes.append(record_datetime[record_index-period_seconds+1])
-                currents.append(record_current/period)
-                voltages.append(record_voltage/period)
-                period_seconds, record_current, record_voltage = 0, 0, 0
-
-            elif record_index == len(record_datetime) - 1:
-                period_datetimes.append(record_datetime[record_index - period_seconds+1])
-                currents.append(record_current / period)
-                voltages.append(record_voltage / period)
-
-        measure_records = [period_datetimes, currents, voltages, period_port_states]
-        return measure_records
 
     def create_ports(self):
         if self.get_port_state(2) is None:

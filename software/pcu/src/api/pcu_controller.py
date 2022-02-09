@@ -15,10 +15,10 @@ pcu_service_repo.create_ports()
 
 pcu_service = PcuService(pcu_service_repo)
 
-pcu_adc_repo = PcuRepository(db_file_path)
-pcu_adc = ADCSimulator(pcu_adc_repo)
-adc_thread = threading.Thread(target=pcu_adc.launch_simulation, args=(10,))
-adc_thread.start()
+# pcu_adc_repo = PcuRepository(db_file_path)
+# pcu_adc = ADCSimulator(pcu_adc_repo)
+# adc_thread = threading.Thread(target=pcu_adc.launch_simulation, args=(10,))
+# adc_thread.start()
 
 
 @app.route('/pcu', methods=['POST'])

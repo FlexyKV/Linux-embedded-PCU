@@ -1,5 +1,6 @@
 from software.pcu.src.repository.pcu_repository import PcuRepository
-from software.pcu.src.service.mapper import port_measure_mapper, port_state_mapper, str_to_datetime
+from software.pcu.src.service.mapper import parse_record_to_json, MeasureMapper, str_to_datetime, \
+    parse_port_state_to_json
 import json
 
 
@@ -8,18 +9,20 @@ class PcuService:
         self.repository = repository
 
     def get_port_measures(self, port_id: int, start_time: str, end_time: str, period: int):
-        measures = self.repository.get_port_measures(port_id, str_to_datetime(start_time), str_to_datetime(end_time), period)
-        if measures == -1:
+        port_data = self.repository.get_port_measures(port_id, str_to_datetime(start_time), str_to_datetime(end_time))
+        if port_data == -1:
             return json.dumps({"error": "no data"})
-        return port_measure_mapper(measures)
+        mapper = MeasureMapper(*port_data, period, str_to_datetime(start_time), str_to_datetime(end_time))
+        mapped_port_data = mapper.map_measures()
+        return parse_record_to_json(mapped_port_data)
 
     def get_port_state(self, port_id: int):
         port_state = self.repository.get_port_state(port_id)
-        return port_state_mapper(port_id, port_state)
+        return parse_port_state_to_json(port_id, port_state)
 
     def update_port_state(self, port_id: int, state: int):
         # first launch GPIO state change
 
         # if ok change state in repo
         state = self.repository.update_port_state(port_id, state)
-        return port_state_mapper(port_id, state)
+        return parse_port_state_to_json(port_id, state)
