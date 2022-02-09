@@ -81,7 +81,6 @@ def ADC_setup():
     return adc_port
 
 
-def filterValue(voltage, current)
 
 
 def read_value(v_inst_moy, I_inst_moy, adc_port):
