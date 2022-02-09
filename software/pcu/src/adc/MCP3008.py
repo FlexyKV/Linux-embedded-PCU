@@ -1,8 +1,10 @@
 import Adafruit_GPIO.GPIO as GPIO
 import Adafruit_GPIO.SPI as SPI
 import time
+
 import math
 import threading
+
 
 
 class MCP3008(object):
