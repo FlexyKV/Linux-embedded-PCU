@@ -2,6 +2,7 @@ import sqlite3
 from sqlite3 import Error
 from datetime import timedelta, datetime
 
+
 class PcuRepository:
     def __init__(self, db):
         self.db = db
@@ -18,7 +19,7 @@ class PcuRepository:
     def close_connexion(self):
         self.conn.close()
 
-    def __get_records(self, start_time: datetime, end_time: datetime, record_period: int):
+    def __get_records(self, start_time: datetime, end_time: datetime):
         try:
             cur = self.conn.cursor()
             get_timeframe_query = """SELECT id, record_datetime as "[timestamp]", record_port_states FROM record 
@@ -31,7 +32,7 @@ class PcuRepository:
             return -1
         return records
 
-    def __insert_record(self, record_datetime: datetime, period: int):
+    def __insert_record(self, record_datetime: datetime):
         try:
             cur = self.conn.cursor()
             get_states_query = """SELECT port_state FROM port"""
@@ -40,8 +41,8 @@ class PcuRepository:
             int_state = 0
             for state in port_states:
                 int_state = (int_state << 1) | state
-            insert_record_query = """INSERT INTO record VALUES (NULL, ?, ?, ?)"""
-            cur.execute(insert_record_query, [record_datetime, period, int_state])
+            insert_record_query = """INSERT INTO record VALUES (NULL, ?, ?)"""
+            cur.execute(insert_record_query, [record_datetime, int_state])
             self.conn.commit()
         except Error as e:
             print(e)
@@ -105,11 +106,10 @@ class PcuRepository:
         self.close_connexion()
         return new_port_state[0]
 
-    def insert_port_measures(self, record_datetime: datetime, record_period: int,
-                             current: list, voltage: list):
+    def insert_port_measures(self, record_datetime: datetime, current: list, voltage: list):
 
         self.open_connection()
-        record_id = self.__insert_record(record_datetime, record_period)
+        record_id = self.__insert_record(record_datetime)
         measure_ids = []
         for port_id in range(8):
             measure_ids.append(self.__insert_measure(record_id, port_id, current[port_id], voltage[port_id]))
@@ -121,7 +121,7 @@ class PcuRepository:
         self.open_connection()
 
         # when big number of record i get 1 more record id then record datetime, WTF WHY?
-        records = self.__get_records(start_time, end_time, period)
+        records = self.__get_records(start_time, end_time)
         record_ids = list(map(lambda r_id: r_id[0], records))
         record_datetime = list(map(lambda dt: dt[1], records))
         record_ports_states = list(map(lambda st: st[2], records))
@@ -268,7 +268,6 @@ class PcuRepository:
         sql_create_record = """CREATE TABLE IF NOT EXISTS "record" (
         "id" INTEGER NOT NULL PRIMARY KEY,
         "record_datetime" DATETIME NOT NULL,
-        "record_period" INTEGER NOT NULL,
         "record_port_states" INTEGER NOT NULL
         );"""
 
