@@ -1,26 +1,28 @@
+from software.pcu.src.repository.pcu_repository import PcuRepository
+from software.pcu.src.service.mapper import parse_record_to_json, MeasureMapper, str_to_datetime, \
+    parse_port_state_to_json
 import json
-from software.pcu.src.repository.repository import PcuRepository
-import datetime
+
 
 class PcuService:
     def __init__(self, repository: PcuRepository):
         self.repository = repository
 
-    def get_pcu_port_measures(self, port_number: int, start_time: datetime, end_time: datetime):
-        return 'empty.'
+    def get_port_measures(self, port_id: int, start_time: str, end_time: str, period: int):
+        port_data = self.repository.get_port_measures(port_id, str_to_datetime(start_time), str_to_datetime(end_time))
+        if port_data == -1:
+            return json.dumps({"error": "no data"})
+        mapper = MeasureMapper(*port_data, period, str_to_datetime(start_time), str_to_datetime(end_time))
+        mapped_port_data = mapper.map_measures()
+        return parse_record_to_json(mapped_port_data)
 
+    def get_port_state(self, port_id: int):
+        port_state = self.repository.get_port_state(port_id)
+        return parse_port_state_to_json(port_id, port_state)
 
-    def port_control(port_nb, state):
-        return 'empty.'
+    def update_port_state(self, port_id: int, state: int):
+        # first launch GPIO state change
 
-
-    def get_events(port_nb, event_type, period):
-        return 'empty.'
-
-
-    def get_ports_states():
-        return 'empty.'
-
-
-    def get_ports_powers():
-        return 'empty.'
+        # if ok change state in repo
+        state = self.repository.update_port_state(port_id, state)
+        return parse_port_state_to_json(port_id, state)

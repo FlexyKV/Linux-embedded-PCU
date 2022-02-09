@@ -17,7 +17,7 @@ pcu_service = PcuService(pcu_service_repo)
 
 # pcu_adc_repo = PcuRepository(db_file_path)
 # pcu_adc = ADCSimulator(pcu_adc_repo)
-# adc_thread = threading.Thread(target=pcu_adc.launch_simulation, args=(5,))
+# adc_thread = threading.Thread(target=pcu_adc.launch_simulation, args=(10,))
 # adc_thread.start()
 
 

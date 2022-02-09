@@ -26,5 +26,5 @@ class loggingSyslog(object):
         #logging.info('Puissance moyenne: %s  Courant:%s  ADC0: %s  ADC1: %s', a, b,c,d)
 
 
-logging1 = loggingSyslog("192.168.1.80",514)
+logging1 = loggingSyslog("192.168.1.80", 514)
 logging1.logging_valeurs()
