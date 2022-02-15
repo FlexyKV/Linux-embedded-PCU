@@ -1,12 +1,9 @@
 # myapp.py
 import logging
 import logging.handlers
-import random
 from datetime import datetime, timedelta
-import sys
-import threading
 
-from software.pcu.src.service.mapper import MeasureMapper
+from pcu.src.service.mapper import MeasureMapper
 
 #À mettre dans pcu_controller
 #pcu_logging_repo = PcuRepository(db_file_path)

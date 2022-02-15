@@ -1,6 +1,6 @@
 import sqlite3
 from sqlite3 import Error
-from datetime import timedelta, datetime
+from datetime import datetime
 
 
 class PcuRepository:
@@ -143,7 +143,6 @@ class PcuRepository:
 
         return record_datetime, record_port_states, measures
 
-
     def create_ports(self):
         if self.get_port_state(2) is None:
             self.open_connection()
@@ -156,7 +155,7 @@ class PcuRepository:
             except Error as e:
                 print(e)
                 return -1
-        self.close_connexion()
+            self.close_connexion()
         return 0
 
     def create_tables(self):

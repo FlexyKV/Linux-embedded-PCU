@@ -6,11 +6,12 @@ name = "pypi"
 [packages]
 flask = "*"
 Adafruit_GPIO = "*"
-matplotlib = "*"
+gunicorn = "*"
 
 
 [requires]
 python_version = "3"
 
 [scripts]
-serve = "python -m src/api/pcu_controller.py"
+serve = "gunicorn -b 0.0.0.0:5000 src:app"
+adc = "python src/run_adc_simulation.py"

@@ -21,10 +21,11 @@ class ADCSimulator:
         current_time = datetime.datetime.now()
         self.repository.insert_port_measures(current_time, current_adc, voltage_adc)
 
+
     def launch_simulation(self, simulation_time):
         print("launch start")
         elapsed_time = 0
-        while True: # simulation_time - elapsed_time > 0:
+        while simulation_time - elapsed_time > 0:
             self.save_measures()
             elapsed_time += 1
             print(f"measure save {elapsed_time}")
