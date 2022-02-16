@@ -1,7 +1,7 @@
 import sqlite3
 from sqlite3 import Error
 from datetime import datetime
-
+from src.mapper.mapper import bitmap_to_port_state
 
 class PcuRepository:
     def __init__(self, db):
@@ -74,6 +74,25 @@ class PcuRepository:
             return -1
         return cur.lastrowid
 
+    def __get_port_measures_from_datetimes(self, port_id: int, start_time: datetime, end_time: datetime) -> list:
+
+        try:
+            cur = self.conn.cursor()
+            port_data_query = """
+                       SELECT measure.current, measure.voltage, record.record_datetime as "[timestamp]", 
+                       record.record_port_states FROM measure
+                       INNER JOIN record ON measure.record_id = record.id
+                       WHERE record.record_datetime >= ? AND record.record_datetime < ?
+                       AND measure.port_id = ?
+                       """
+            cur.execute(port_data_query, [start_time, end_time, port_id])
+            port_data = cur.fetchall()
+            self.conn.commit()
+        except Error as e:
+            print(e)
+            return -1
+        return port_data
+
     def get_port_state(self, port_id: int):
         self.open_connection()
         try:
@@ -120,28 +139,17 @@ class PcuRepository:
 
         self.open_connection()
 
-        # when big number of record i get 1 more record id then record datetime, WTF WHY?
-        records = self.__get_records(start_time, end_time)
-        record_ids = list(map(lambda r_id: r_id[0], records))
-        record_datetime = list(map(lambda dt: dt[1], records))
-        record_ports_states = list(map(lambda st: st[2], records))
-        record_port_states = []
-
-        # get port state from list of states
-        for record_states in record_ports_states:
-            record_binary_states = [1 if digit == '1' else 0 for digit in bin(record_states)[2:]]
-            while len(record_binary_states) < 8:
-                record_binary_states.insert(0, 0)
-            port_id_record_state = int(record_binary_states[port_id])
-            record_port_states.append(port_id_record_state)
-
-        measures = self.__get_measures(port_id, record_ids)
-        self.close_connexion()
-
-        if not records:
+        record_data = self.__get_port_measures_from_datetimes(port_id, start_time, end_time)
+        if not record_data:
             return -1
 
-        return record_datetime, record_port_states, measures
+        record_measures = list(map(lambda r_measure: (r_measure[0], r_measure[1]), record_data))
+        record_datetime = list(map(lambda r_vo: r_vo[2], record_data))
+        record_port_states = list(map(lambda ps: bitmap_to_port_state(ps[3], port_id), record_data))
+
+        self.close_connexion()
+
+        return record_datetime, record_port_states, record_measures
 
     def create_ports(self):
         if self.get_port_state(2) is None:

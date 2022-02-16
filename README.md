@@ -35,16 +35,37 @@ image
 
 ### How to use project
 
-(temp)
-connect ssh:
+#### On work computer
+
+Connect ssh:
 
 ```
-ssh pi@raspberry.local 
+ssh pi@pcu.local 
 ```
 
-(temp) sync file:
+Sync file:
 
 ```
-scp src/api/pcu_controller.py pi@raspberry.local:/home/pi
-scp -r pcu pi@pcu.local:/home/pi
+scp -prq pcu pi@pcu.local:/home/pi
+```
+
+#### On Raspberry Pi
+
+Install pipenv:
+
+```
+sudo apt-get remove pipenv
+pip3 install pipenv
+```
+
+Run adc:
+
+```
+python -m pipenv run adc
+```
+
+Run server:
+
+```
+python -m pipenv run server
 ```

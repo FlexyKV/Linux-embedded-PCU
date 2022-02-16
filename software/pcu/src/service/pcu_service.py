@@ -1,5 +1,5 @@
 from src.repository.pcu_repository import PcuRepository
-from src.service.mapper import parse_record_to_json, MeasureMapper, str_to_datetime, \
+from src.mapper.mapper import parse_record_to_json, MeasureMapper, str_to_datetime, \
     parse_port_state_to_json
 import json
 

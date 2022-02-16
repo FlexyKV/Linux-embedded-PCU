@@ -3,7 +3,7 @@ import logging
 import logging.handlers
 from datetime import datetime, timedelta
 
-from pcu.src.service.mapper import MeasureMapper
+from src.mapper.mapper import MeasureMapper
 
 #À mettre dans pcu_controller
 #pcu_logging_repo = PcuRepository(db_file_path)

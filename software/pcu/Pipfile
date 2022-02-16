@@ -7,6 +7,7 @@ name = "pypi"
 flask = "*"
 Adafruit_GPIO = "*"
 gunicorn = "*"
+waitress = "*" # to delete, used to do local server tests on windows
 
 
 [requires]
@@ -15,3 +16,5 @@ python_version = "3"
 [scripts]
 serve = "gunicorn -b 0.0.0.0:5000 src:app"
 adc = "python src/run_adc_simulation.py"
+serve_ws = "waitress-serve --listen=0.0.0.0:5000 src:app" # to delete, used to do local server tests on windows
+
