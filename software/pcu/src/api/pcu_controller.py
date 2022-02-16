@@ -14,20 +14,16 @@ pcu_service_repo.create_ports()
 pcu_service = PcuService(pcu_service_repo)
 
 
-@bp.route('/pcu', methods=['POST'])
-def test():
-    response = {
-        "status": 200,
-        "test": "test122223"
-    }
-    return jsonify(response)
-
-
 @bp.route('/port_measures', methods=['GET'])
 def get_port_measures():
     payload = json.loads(request.get_data())
     return pcu_service.get_port_measures(payload["port_id"], payload["start_time"],
                                          payload["end_time"], payload["period"])
+
+
+@bp.route('/instant_measures', methods=['GET'])
+def get_instant_measures():
+    return pcu_service.get_instant_measures()
 
 
 @bp.route('/port_state', methods=['GET'])

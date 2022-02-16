@@ -3,6 +3,7 @@ from sqlite3 import Error
 from datetime import datetime
 from src.mapper.mapper import bitmap_to_port_state
 
+
 class PcuRepository:
     def __init__(self, db):
         self.db = db
@@ -90,8 +91,35 @@ class PcuRepository:
             self.conn.commit()
         except Error as e:
             print(e)
-            return -1
+            return [-1]
         return port_data
+
+    def __get_port_states(self):
+        try:
+            cur = self.conn.cursor()
+            get_port_query = """SELECT port_state FROM port"""
+            cur.execute(get_port_query)
+            port_states = cur.fetchall()
+            self.conn.commit()
+        except Error as e:
+            print(e)
+            return -1
+        return port_states
+
+    def __get_last_measures(self):
+        try:
+            cur = self.conn.cursor()
+            get_port_query = """SELECT record.record_datetime as "[timestamp]", measure.current, measure.voltage 
+            FROM measure
+            INNER JOIN record ON record.id = measure.id 
+            ORDER BY record.id DESC LIMIT 1"""
+            cur.execute(get_port_query)
+            last_measures  = cur.fetchall()
+            self.conn.commit()
+        except Error as e:
+            print(e)
+            return -1
+        return last_measures
 
     def get_port_state(self, port_id: int):
         self.open_connection()
@@ -150,6 +178,17 @@ class PcuRepository:
         self.close_connexion()
 
         return record_datetime, record_port_states, record_measures
+
+    def get_instant_measures(self):
+        self.open_connection()
+
+        # should I manually get the present port states or return the port states of the last measure records ?
+        port_states = self.__get_port_states()
+        last_measures = self.__get_last_measures()
+
+        self.close_connexion()
+
+        return last_measures, port_states
 
     def create_ports(self):
         if self.get_port_state(2) is None:
