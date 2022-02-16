@@ -1,7 +1,12 @@
 import sqlite3
 from sqlite3 import Error
 from datetime import datetime
-from src.mapper.mapper import bitmap_to_port_state
+
+def bitmap_to_port_state(bitmap: int, port_id: int):
+    record_binary_states = [1 if digit == '1' else 0 for digit in bin(bitmap)[2:]]
+    while len(record_binary_states) < 8:
+        record_binary_states.insert(0, 0)
+    return int(record_binary_states[port_id])
 
 
 class PcuRepository:

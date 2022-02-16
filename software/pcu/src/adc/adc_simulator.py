@@ -13,12 +13,15 @@ class ADCSimulator:
         print("init done")
 
     def save_measures(self):
-        current_adc = []
-        voltage_adc = []
+        current_adc = [0] * 8
+        voltage_adc = [0] * 8
         for value in range(8):
+            #TODO
+            #Modifier append pour optimiser vitesse
             current_adc.append(random.uniform(3, 5))
             voltage_adc.append(random.uniform(3, 5))
         current_time = datetime.datetime.now()
+        #Current_time: time(second) of the value
         self.repository.insert_port_measures(current_time, current_adc, voltage_adc)
 
 
@@ -29,5 +32,5 @@ class ADCSimulator:
             self.save_measures()
             elapsed_time += 1
             print(f"measure save {elapsed_time}")
-            sleep(1)
+            sleep(0.9)
         # print("launch end")
