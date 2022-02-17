@@ -23,8 +23,9 @@ PORT_ANTICONFIRM = 40
 def gpio_setup():
     gpio.setwarnings(False)
     gpio.setmode(gpio.BOARD)
+    #Setup ANTICONFIRM TO FALSE SO THAT NO RELAY WILL CHANGE STATE IF NOISE
     gpio.setup(PORT_ANTICONFIRM, gpio.OUT)
-    gpio.setup(PORT_ANTICONFIRM, True)
+    gpio.setup(PORT_ANTICONFIRM, False)
 
     gpio.setup(PORT_CONFIRM, gpio.OUT)
     gpio.setup(PORT1_GATE1, gpio.OUT)
@@ -44,21 +45,30 @@ def gpio_setup():
     gpio.setup(PORT8_GATE1, gpio.OUT)
     gpio.setup(PORT8_GATE2, gpio.OUT)
 
-
 #TODO
 # Tester avec circuit de relai GEL
 def gpio_toggle_ON(gate_number):
     gate1 = "PORT" + str(gate_number) +"_GATE1"
     gate2 = "PORT" + str(gate_number) +"_GATE2"
-    gpio.output(globals()[gate1], True)
     gpio.output(globals()[gate2], False)
-    gpio.output(PORT_ANTICONFIRM)
+    sleep(0.1)
+    gpio.output(globals()[gate1], True)
+    sleep(0.1)
+    gpio.output(PORT_CONFIRM, True)
+    sleep(0.1)
+    gpio.output(PORT_CONFIRM, False)
+
 
 def gpio_toggle_OFF(gate_number):
     gate1 = "PORT" + str(gate_number) +"_GATE1"
     gate2 = "PORT" + str(gate_number) +"_GATE2"
     gpio.output(globals()[gate1], False)
-    gpio.output(globals()[gate2], False)
+    sleep(0.1)
+    gpio.output(globals()[gate2], True)
+    sleep(0.1)
+    gpio.output(PORT_CONFIRM, True)
+    sleep(0.1)
+    gpio.output(PORT_CONFIRM, False)
 
 
 def gpio_test_function():
@@ -66,14 +76,14 @@ def gpio_test_function():
     gpio_setup()
 
     gpio_toggle_ON(1)
-    sleep(0.5)
+    sleep(1)
     gpio_toggle_OFF(1)
-    sleep(0.5)
-    gpio_toggle_ON(2)
-    sleep(0.5)
-    gpio_toggle_OFF(2)
+    sleep(2)
+    gpio_toggle_ON(1)
+    sleep(1)
+    gpio_toggle_OFF(1)
 
-    print("success!")
+    print("success motherfucka !!!!")
 
 
 if __name__ == "__main__":
