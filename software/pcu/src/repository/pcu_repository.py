@@ -236,11 +236,15 @@ class PcuRepository:
         FOREIGN KEY ("port_id") REFERENCES "port" ("id") ON DELETE CASCADE ON UPDATE CASCADE
         );"""
 
+        sql_create_bookmaking = """ CREATE TABLE IF NOT EXISTS "bookkeepings" (
+        bk_name TEXT PRIMARY KEY, bk_value INTEGER NOT NULL);"""
+
         try:
             cur = self.conn.cursor()
             cur.execute(sql_create_record)
             cur.execute(sql_create_port)
             cur.execute(sql_create_measure)
+            cur.execute(sql_create_bookmaking)
             self.conn.commit()
         except Error as e:
             print(e)
@@ -248,3 +252,33 @@ class PcuRepository:
 
         self.close_connexion()
         return 0
+
+    def create_triggers(self):
+
+        delete_old_records_trigger = """CREATE TRIGGER log_entries_limit_trigger BEFORE INSERT ON record
+          FOR EACH ROW
+          WHEN (SELECT bk_value FROM bookkeepings WHERE bk_name = 'Qty Entries')
+            >= (SELECT bk_value FROM bookkeepings WHERE bk_name = 'Max Entries')
+          BEGIN
+            DELETE FROM log_entries
+              WHEN timestamp = (SELECT timestamp FROM record ORDER BY timestamp LIMIT 1);
+          END;
+        """
+
+        increment_bookkeeping_trigger = """CREATE TRIGGER log_entries_count_insert_trigger AFTER INSERT ON record
+        FOR EACH ROW
+        BEGIN
+            UPDATE bookkeepings SET bk_value = bk_value + 1 WHERE bk_name = 'Qty Entries';
+        end;
+        """
+
+        decrement_bookkeeping_trigger = """CREATE TRIGGER log_entries_count_delete_trigger AFTER DELETE ON record
+        FOR EACH ROW
+        BEGIN
+            UPDATE bookkeepings SET bk_value = bk_value - 1 WHERE bk_name = 'Qty Entries';
+        end;
+        """
+
+        initialise_bookkeeping = """INSERT into bookkeepings values ('Max Entries', 50);
+        insert into bookkeepings values ('Qty Entries', 0);"""
+
