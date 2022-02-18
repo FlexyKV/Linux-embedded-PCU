@@ -2,13 +2,8 @@ import sqlite3
 from sqlite3 import Error
 from datetime import datetime
 
-def bitmap_to_port_state(bitmap: int, port_id: int):
-    record_binary_states = [1 if digit == '1' else 0 for digit in bin(bitmap)[2:]]
-    while len(record_binary_states) < 8:
-        record_binary_states.insert(0, 0)
-    return int(record_binary_states[port_id])
 
-
+# TODO always do one operation per commit and use when: syntax for rollback system
 class PcuRepository:
     def __init__(self, db):
         self.db = db
@@ -178,11 +173,18 @@ class PcuRepository:
 
         record_measures = list(map(lambda r_measure: (r_measure[0], r_measure[1]), record_data))
         record_datetime = list(map(lambda r_vo: r_vo[2], record_data))
-        record_port_states = list(map(lambda ps: bitmap_to_port_state(ps[3], port_id), record_data))
+        record_port_states = list(map(lambda ps: self.__bitmap_to_port_state(ps[3], port_id), record_data))
 
         self.close_connexion()
 
         return record_datetime, record_port_states, record_measures
+
+    @staticmethod
+    def __bitmap_to_port_state(bitmap: int, port_id: int):
+        record_binary_states = [1 if digit == '1' else 0 for digit in bin(bitmap)[2:]]
+        while len(record_binary_states) < 8:
+            record_binary_states.insert(0, 0)
+        return int(record_binary_states[port_id])
 
     def get_instant_measures(self):
         self.open_connection()
@@ -195,6 +197,7 @@ class PcuRepository:
 
         return last_measures, port_states
 
+    # TODO create class or a cleaner system (direct sqlite command file maybe) to create table, trigger and ports
     def create_ports(self):
         if self.get_port_state(2) is None:
             self.open_connection()
@@ -279,6 +282,21 @@ class PcuRepository:
         end;
         """
 
-        initialise_bookkeeping = """INSERT into bookkeepings values ('Max Entries', 50);
+        initialise_bookkeeping = """INSERT into bookkeepings values ('Max Entries', 10);
         insert into bookkeepings values ('Qty Entries', 0);"""
+
+        self.open_connection()
+
+        try:
+            cur = self.conn.cursor()
+            cur.execute(delete_old_records_trigger)
+            cur.execute(increment_bookkeeping_trigger)
+            cur.execute(decrement_bookkeeping_trigger)
+            cur.execute(initialise_bookkeeping)
+            self.conn.commit()
+        except Error as e:
+            print(e)
+            return -1
+
+        self.close_connexion()
 

@@ -52,6 +52,7 @@ class MeasureMapper:
             = 0, 0, 0, 0, 0
 
     def __calculate_max_min_avg(self, currents, voltages, powers):
+        # TODO take min and max from all data not period data
         self.max_measures = (max(currents), max(voltages), max(powers))
         self.min_measures = (min(currents), min(voltages), min(powers))
         self.avg_measures = (sum(currents) / len(currents), sum(voltages) / len(voltages), sum(powers) / len(powers))
