@@ -1,6 +1,7 @@
 import RPi.GPIO as gpio
 from time import sleep
 
+#IO FOR THE RELAY CONTROL (SEE HARDWARE FOLDER FOR PINOUT)
 PORT1_GATE1 = 37
 PORT1_GATE2 = 38
 PORT2_GATE1 = 36
@@ -20,13 +21,15 @@ PORT8_GATE2 = 3
 PORT_CONFIRM = 35
 PORT_ANTICONFIRM = 40
 
+#NECESSARY DELAY FOR THE RT314F12 RELAY GATE AND MOSFET DELAY (seconds)
+RELAY_DELAY = 0.05
+
 def gpio_setup():
     gpio.setwarnings(False)
     gpio.setmode(gpio.BOARD)
     #Setup ANTICONFIRM TO FALSE SO THAT NO RELAY WILL CHANGE STATE IF NOISE
     gpio.setup(PORT_ANTICONFIRM, gpio.OUT)
     gpio.setup(PORT_ANTICONFIRM, False)
-
     gpio.setup(PORT_CONFIRM, gpio.OUT)
     gpio.setup(PORT1_GATE1, gpio.OUT)
     gpio.setup(PORT1_GATE2, gpio.OUT)
@@ -44,30 +47,30 @@ def gpio_setup():
     gpio.setup(PORT7_GATE2, gpio.OUT)
     gpio.setup(PORT8_GATE1, gpio.OUT)
     gpio.setup(PORT8_GATE2, gpio.OUT)
+    sleep(RELAY_DELAY)
 
-#TODO
-# Tester avec circuit de relai GEL
+
 def gpio_toggle_ON(gate_number):
-    gate1 = "PORT" + str(gate_number) +"_GATE1"
-    gate2 = "PORT" + str(gate_number) +"_GATE2"
+    gate1 = "PORT" + str(gate_number) + "_GATE1"
+    gate2 = "PORT" + str(gate_number) + "_GATE2"
     gpio.output(globals()[gate2], False)
-    sleep(0.1)
+    sleep(RELAY_DELAY)
     gpio.output(globals()[gate1], True)
-    sleep(0.1)
+    sleep(RELAY_DELAY)
     gpio.output(PORT_CONFIRM, True)
-    sleep(0.1)
+    sleep(RELAY_DELAY)
     gpio.output(PORT_CONFIRM, False)
 
 
 def gpio_toggle_OFF(gate_number):
-    gate1 = "PORT" + str(gate_number) +"_GATE1"
-    gate2 = "PORT" + str(gate_number) +"_GATE2"
+    gate1 = "PORT" + str(gate_number) + "_GATE1"
+    gate2 = "PORT" + str(gate_number) + "_GATE2"
     gpio.output(globals()[gate1], False)
-    sleep(0.1)
+    sleep(RELAY_DELAY)
     gpio.output(globals()[gate2], True)
-    sleep(0.1)
+    sleep(RELAY_DELAY)
     gpio.output(PORT_CONFIRM, True)
-    sleep(0.1)
+    sleep(RELAY_DELAY)
     gpio.output(PORT_CONFIRM, False)
 
 
@@ -75,15 +78,31 @@ def gpio_test_function():
     gpio.setwarnings(False)
     gpio_setup()
 
+
+    #NO DELAY ON - OFF
     gpio_toggle_ON(1)
-    sleep(1)
+    sleep(0)
     gpio_toggle_OFF(1)
-    sleep(2)
+    sleep(3)
+
+    #NO DELAY ON - OFF - ON
     gpio_toggle_ON(1)
-    sleep(1)
+    sleep(0)
+    gpio_toggle_OFF(1)
+    sleep(0)
+    gpio_toggle_ON(1)
+    sleep(3)
+
+    #ON - ON
+    gpio_toggle_ON(1)
+    sleep(3)
+
+    #OFF - OFF
+    gpio_toggle_OFF(1)
+    sleep(0.5)
     gpio_toggle_OFF(1)
 
-    print("success motherfucka !!!!")
+    print("success !!")
 
 
 if __name__ == "__main__":
