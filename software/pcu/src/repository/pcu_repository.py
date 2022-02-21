@@ -1,4 +1,5 @@
 import sqlite3
+import timeit
 from sqlite3 import Error
 from datetime import datetime
 
@@ -36,13 +37,16 @@ class PcuRepository:
     def __insert_record(self, record_datetime: datetime):
         try:
             cur = self.conn.cursor()
+
             get_states_query = """SELECT port_state FROM port"""
             cur.execute(get_states_query)
             port_states = list(map(lambda st: st[0], cur.fetchall()))
             int_state = 0
             for state in port_states:
                 int_state = (int_state << 1) | state
+            query_for_cascade_delete = """ PRAGMA foreign_keys=ON"""
             insert_record_query = """INSERT INTO record VALUES (NULL, ?, ?)"""
+            cur.execute(query_for_cascade_delete)
             cur.execute(insert_record_query, [record_datetime, int_state])
             self.conn.commit()
         except Error as e:
@@ -154,7 +158,6 @@ class PcuRepository:
         return new_port_state[0]
 
     def insert_port_measures(self, record_datetime: datetime, current: list, voltage: list):
-
         self.open_connection()
         record_id = self.__insert_record(record_datetime)
         measure_ids = []
@@ -240,7 +243,9 @@ class PcuRepository:
         );"""
 
         sql_create_bookmaking = """ CREATE TABLE IF NOT EXISTS "bookkeepings" (
-        bk_name TEXT PRIMARY KEY, bk_value INTEGER NOT NULL);"""
+        "bk_name" TEXT PRIMARY KEY,
+        "bk_value" INTEGER NOT NULL
+         );"""
 
         try:
             cur = self.conn.cursor()
@@ -258,45 +263,51 @@ class PcuRepository:
 
     def create_triggers(self):
 
-        delete_old_records_trigger = """CREATE TRIGGER log_entries_limit_trigger BEFORE INSERT ON record
+        self.open_connection()
+        # 1 day history = 86400 entries
+        initialise_bookkeeping_max = """INSERT INTO bookkeepings VALUES ('Max Entries', 86400);"""
+        initialise_bookkeeping_entries = """INSERT INTO bookkeepings VALUES ('Qty Entries', 0);"""
+
+        delete_old_records_trigger = """CREATE TRIGGER record_limit_trigger BEFORE INSERT ON record
           FOR EACH ROW
           WHEN (SELECT bk_value FROM bookkeepings WHERE bk_name = 'Qty Entries')
             >= (SELECT bk_value FROM bookkeepings WHERE bk_name = 'Max Entries')
           BEGIN
-            DELETE FROM log_entries
-              WHEN timestamp = (SELECT timestamp FROM record ORDER BY timestamp LIMIT 1);
+
+            DELETE FROM record
+              WHERE record_datetime = (SELECT record_datetime FROM record ORDER BY record_datetime LIMIT 1);
           END;
         """
 
-        increment_bookkeeping_trigger = """CREATE TRIGGER log_entries_count_insert_trigger AFTER INSERT ON record
+        increment_bookkeeping_trigger = """CREATE TRIGGER record_count_insert_trigger AFTER INSERT ON record
         FOR EACH ROW
         BEGIN
             UPDATE bookkeepings SET bk_value = bk_value + 1 WHERE bk_name = 'Qty Entries';
-        end;
+        END;
         """
 
-        decrement_bookkeeping_trigger = """CREATE TRIGGER log_entries_count_delete_trigger AFTER DELETE ON record
+        decrement_bookkeeping_trigger = """CREATE TRIGGER record_count_delete_trigger AFTER DELETE ON record
         FOR EACH ROW
         BEGIN
             UPDATE bookkeepings SET bk_value = bk_value - 1 WHERE bk_name = 'Qty Entries';
-        end;
+        END;
         """
 
-        initialise_bookkeeping = """INSERT into bookkeepings values ('Max Entries', 10);
-        insert into bookkeepings values ('Qty Entries', 0);"""
 
-        self.open_connection()
 
         try:
             cur = self.conn.cursor()
+            cur.execute(initialise_bookkeeping_max)
+            cur.execute(initialise_bookkeeping_entries)
             cur.execute(delete_old_records_trigger)
             cur.execute(increment_bookkeeping_trigger)
             cur.execute(decrement_bookkeeping_trigger)
-            cur.execute(initialise_bookkeeping)
             self.conn.commit()
         except Error as e:
             print(e)
             return -1
 
         self.close_connexion()
+        return 0
 
+        # with self.db as cur:

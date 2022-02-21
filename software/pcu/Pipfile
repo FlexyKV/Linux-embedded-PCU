@@ -15,8 +15,8 @@ python_version = "3"
 
 [scripts]
 serve = "gunicorn -b 0.0.0.0:5000 src:app"
-adc = "python src/adc/mcp3008.py"
+adc = "python src/domain/adc/mcp3008.py"
 adc_sim = "python src/run_adc_simulator.py"
 serve_ws = "waitress-serve --listen=0.0.0.0:5000 src:app" # to delete, used to do local server tests on windows
-gpio_toggle = "python src/ports/pcu_ports.py"
+gpio_toggle = "python src/domain/ports/pcu_ports.py"
 
