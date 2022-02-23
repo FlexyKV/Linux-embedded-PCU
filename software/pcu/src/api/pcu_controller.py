@@ -2,6 +2,7 @@ import json
 from flask import request, Blueprint
 from src.service.pcu_service import PcuService
 from src.repository.pcu_repository import PcuRepository
+from src.domain.ports.pcu_ports import gpio_setup
 
 bp = Blueprint('pcu', __name__, url_prefix='/')
 
@@ -12,6 +13,7 @@ pcu_service_repo.create_tables()
 pcu_service_repo.create_ports()
 pcu_service_repo.create_triggers()
 pcu_service = PcuService(pcu_service_repo)
+gpio_setup()
 
 
 @bp.route('/port_measures', methods=['GET'])

@@ -24,6 +24,7 @@ PORT_ANTICONFIRM = 40
 #NECESSARY DELAY FOR THE RT314F12 RELAY GATE AND MOSFET DELAY (seconds)
 RELAY_DELAY = 0.05
 
+
 def gpio_setup():
     gpio.setwarnings(False)
     gpio.setmode(gpio.BOARD)
@@ -60,6 +61,7 @@ def gpio_toggle_ON(gate_number):
     gpio.output(PORT_CONFIRM, True)
     sleep(RELAY_DELAY)
     gpio.output(PORT_CONFIRM, False)
+    print(f"port {gate_number} is on")
 
 
 def gpio_toggle_OFF(gate_number):
@@ -72,6 +74,7 @@ def gpio_toggle_OFF(gate_number):
     gpio.output(PORT_CONFIRM, True)
     sleep(RELAY_DELAY)
     gpio.output(PORT_CONFIRM, False)
+    print(f"port {gate_number} is off")
 
 
 def gpio_test_function():

@@ -61,11 +61,11 @@ pip3 install pipenv
 Run adc:
 
 ```
-python -m pipenv run adc
+python3 -m pipenv run adc
 ```
 
 Run server:
 
 ```
-python -m pipenv run server
+python3 -m pipenv run server
 ```

@@ -1,6 +1,7 @@
 from src.repository.pcu_repository import PcuRepository
 from src.service.mapper.mapper import parse_record_to_json, MeasureMapper, str_to_datetime, \
     parse_port_state_to_json
+from src.domain.ports.pcu_ports import gpio_toggle_ON, gpio_toggle_OFF
 import json
 
 
@@ -28,6 +29,10 @@ class PcuService:
 
     def update_port_state(self, port_id: int, state: int):
         # first launch GPIO state change
+        if state:
+            gpio_toggle_ON(port_id)
+        else:
+            gpio_toggle_OFF(port_id)
 
         # if ok change state in repo
         state = self.repository.update_port_state(port_id, state)
