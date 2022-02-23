@@ -6,8 +6,8 @@ from src.domain.ports.pcu_ports import gpio_setup
 
 bp = Blueprint('pcu', __name__, url_prefix='/')
 
-# db_file_path = r"/home/pi/pcu/PCUDB"
-db_file_path = r"C:\Users\FlexyFlex\PycharmProjects\Linux-embeded-PCU\software\pcu\PCUDB"
+db_file_path = r"/home/pi/pcu/PCUDB"
+# db_file_path = r"C:\Users\FlexyFlex\PycharmProjects\Linux-embeded-PCU\software\pcu\PCUDB"
 pcu_service_repo = PcuRepository(db_file_path)
 pcu_service_repo.create_tables()
 pcu_service_repo.create_ports()

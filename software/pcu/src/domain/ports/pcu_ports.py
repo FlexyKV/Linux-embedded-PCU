@@ -2,22 +2,22 @@ import RPi.GPIO as gpio
 from time import sleep
 
 #IO FOR THE RELAY CONTROL (SEE HARDWARE FOLDER FOR PINOUT)
-PORT1_GATE1 = 37
-PORT1_GATE2 = 38
-PORT2_GATE1 = 36
-PORT2_GATE2 = 33
-PORT3_GATE1 = 31
-PORT3_GATE2 = 32
-PORT4_GATE1 = 29
-PORT4_GATE2 = 22
-PORT5_GATE1 = 18
-PORT5_GATE2 = 15
-PORT6_GATE1 = 13
-PORT6_GATE2 = 16
-PORT7_GATE1 = 11
-PORT7_GATE2 = 7
-PORT8_GATE1 = 5
-PORT8_GATE2 = 3
+PORT0_GATE0 = 37
+PORT0_GATE1 = 38
+PORT1_GATE0 = 36
+PORT1_GATE1 = 33
+PORT2_GATE0 = 31
+PORT2_GATE1 = 32
+PORT3_GATE0 = 29
+PORT3_GATE1 = 22
+PORT4_GATE0 = 18
+PORT4_GATE1 = 15
+PORT5_GATE0 = 13
+PORT5_GATE1 = 16
+PORT6_GATE0 = 11
+PORT6_GATE1 = 7
+PORT7_GATE0 = 5
+PORT7_GATE1 = 3
 PORT_CONFIRM = 35
 PORT_ANTICONFIRM = 40
 
@@ -32,31 +32,33 @@ def gpio_setup():
     gpio.setup(PORT_ANTICONFIRM, gpio.OUT)
     gpio.setup(PORT_ANTICONFIRM, False)
     gpio.setup(PORT_CONFIRM, gpio.OUT)
+    gpio.setup(PORT0_GATE0, gpio.OUT)
+    gpio.setup(PORT0_GATE1, gpio.OUT)
+    gpio.setup(PORT1_GATE0, gpio.OUT)
     gpio.setup(PORT1_GATE1, gpio.OUT)
-    gpio.setup(PORT1_GATE2, gpio.OUT)
+    gpio.setup(PORT2_GATE0, gpio.OUT)
     gpio.setup(PORT2_GATE1, gpio.OUT)
-    gpio.setup(PORT2_GATE2, gpio.OUT)
+    gpio.setup(PORT3_GATE0, gpio.OUT)
     gpio.setup(PORT3_GATE1, gpio.OUT)
-    gpio.setup(PORT3_GATE2, gpio.OUT)
+    gpio.setup(PORT4_GATE0, gpio.OUT)
     gpio.setup(PORT4_GATE1, gpio.OUT)
-    gpio.setup(PORT4_GATE2, gpio.OUT)
+    gpio.setup(PORT5_GATE0, gpio.OUT)
     gpio.setup(PORT5_GATE1, gpio.OUT)
-    gpio.setup(PORT5_GATE2, gpio.OUT)
+    gpio.setup(PORT6_GATE0, gpio.OUT)
     gpio.setup(PORT6_GATE1, gpio.OUT)
-    gpio.setup(PORT6_GATE2, gpio.OUT)
+    gpio.setup(PORT7_GATE0, gpio.OUT)
     gpio.setup(PORT7_GATE1, gpio.OUT)
-    gpio.setup(PORT7_GATE2, gpio.OUT)
-    gpio.setup(PORT8_GATE1, gpio.OUT)
-    gpio.setup(PORT8_GATE2, gpio.OUT)
     sleep(RELAY_DELAY)
 
 
 def gpio_toggle_ON(gate_number):
+    gate0 = "PORT" + str(gate_number) + "_GATE0"
     gate1 = "PORT" + str(gate_number) + "_GATE1"
-    gate2 = "PORT" + str(gate_number) + "_GATE2"
-    gpio.output(globals()[gate2], False)
+    print(gate0)
+    print(gate1)
+    gpio.output(globals()[gate1], False)
     sleep(RELAY_DELAY)
-    gpio.output(globals()[gate1], True)
+    gpio.output(globals()[gate0], True)
     sleep(RELAY_DELAY)
     gpio.output(PORT_CONFIRM, True)
     sleep(RELAY_DELAY)
@@ -65,11 +67,11 @@ def gpio_toggle_ON(gate_number):
 
 
 def gpio_toggle_OFF(gate_number):
+    gate0 = "PORT" + str(gate_number) + "_GATE0"
     gate1 = "PORT" + str(gate_number) + "_GATE1"
-    gate2 = "PORT" + str(gate_number) + "_GATE2"
-    gpio.output(globals()[gate1], False)
+    gpio.output(globals()[gate0], False)
     sleep(RELAY_DELAY)
-    gpio.output(globals()[gate2], True)
+    gpio.output(globals()[gate1], True)
     sleep(RELAY_DELAY)
     gpio.output(PORT_CONFIRM, True)
     sleep(RELAY_DELAY)
@@ -81,9 +83,9 @@ def gpio_test_function():
     gpio.setwarnings(False)
     gpio_setup()
 
-    # gpio_toggle_ON(1)
-    # sleep(1)
-    # gpio_toggle_OFF(1)
+    gpio_toggle_ON(0)
+    sleep(1)
+    gpio_toggle_OFF(0)
 
 
     # #NO DELAY ON - OFF
