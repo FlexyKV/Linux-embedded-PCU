@@ -81,29 +81,33 @@ def gpio_test_function():
     gpio.setwarnings(False)
     gpio_setup()
 
+    # gpio_toggle_ON(1)
+    # sleep(1)
+    # gpio_toggle_OFF(1)
 
-    #NO DELAY ON - OFF
-    gpio_toggle_ON(1)
-    sleep(0)
-    gpio_toggle_OFF(1)
-    sleep(3)
 
-    #NO DELAY ON - OFF - ON
-    gpio_toggle_ON(1)
-    sleep(0)
-    gpio_toggle_OFF(1)
-    sleep(0)
-    gpio_toggle_ON(1)
-    sleep(3)
-
-    #ON - ON
-    gpio_toggle_ON(1)
-    sleep(3)
-
-    #OFF - OFF
-    gpio_toggle_OFF(1)
-    sleep(0.5)
-    gpio_toggle_OFF(1)
+    # #NO DELAY ON - OFF
+    # gpio_toggle_ON(1)
+    # sleep(0)
+    # gpio_toggle_OFF(1)
+    # sleep(3)
+    #
+    # #NO DELAY ON - OFF - ON
+    # gpio_toggle_ON(1)
+    # sleep(0)
+    # gpio_toggle_OFF(1)
+    # sleep(0)
+    # gpio_toggle_ON(1)
+    # sleep(3)
+    #
+    # #ON - ON
+    # gpio_toggle_ON(1)
+    # sleep(3)
+    #
+    # #OFF - OFF
+    # gpio_toggle_OFF(1)
+    # sleep(0.5)
+    # gpio_toggle_OFF(1)
 
     print("success !!")
 
