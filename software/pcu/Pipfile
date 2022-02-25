@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 flask = "*"
+flask-cors = "*"
 Adafruit_GPIO = "*"
 gunicorn = "*"
 waitress = "*" # to delete, used to do local server tests on windows
