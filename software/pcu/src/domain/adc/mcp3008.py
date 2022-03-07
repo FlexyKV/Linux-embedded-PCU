@@ -4,6 +4,7 @@ import time
 import threading
 
 
+
 #Classe MCP3008 permettant d'instancier un objet ADC
 class MCP3008(object):
     """Class to represent an Adafruit MCP3008 analog to digital converter.
@@ -80,7 +81,7 @@ def ADC_setup():
     return adc_port
 
 #Fonction permettant de faire la lecture des ADC ainsis que les calcules de conversion
-def calculate_read(voltage_num, currents_num, power_inst, adc_port, flag):
+def calculate_read(voltage_num, currents_num, power_inst, adc_port):
     def conv_factor_current(adc_data):
         voltage_ref = (adc_port[1].read_adc(1)/1023 * 5.20)
 
@@ -109,65 +110,70 @@ def calculate_read(voltage_num, currents_num, power_inst, adc_port, flag):
         power_inst[6] = voltage_num[0]*currents_num[6]
         power_inst[7] = voltage_num[0]*currents_num[7]
 
-
-
         print("--- %s seconds ---" % (time.time() - start_time))
         print('Voltage | {0:.4f} |'.format(*voltage_num))
         print('Courant | {0:.4f} | {1:.4f} | {2:.4f} | {3:.4f} | {4:.4f} | {5:.4f} | {6:.4f} | {7:.4f} |'.format(*currents_num))
         print('Puissan | {0:.4f} | {1:.4f} | {2:.4f} | {3:.4f} | {4:.4f} | {5:.4f} | {6:.4f} | {7:.4f} |'.format(*power_inst))
 
+
 #Fonction permettant de faire différent debug selon le niveau d'abtraction (branchement, lecture, encodage, etc..)
-def debug_adc_read(voltage_num, currents_num, power_inst, adc_port, flag):
-    counter = 0
-    state = True
-    gpio_setup()
+def debug_adc_read(voltage_num, currents_num, power_inst, adc_port):
+    voltage_list = []
+    current_list0 = []
+    current_list1 = []
+    current_list2 = []
 
-
+    power_list = [0] * 8
     def conv_factor_current(adc_data):
         voltage_ref = (adc_port[1].read_adc(1) / 1023 * 5.20)
 
         retVal = ((((((adc_data) / 1023 * 5.2) - voltage_ref) / 110) * 30) / 0.053) / 1.41
         return retVal
 
-    while (1):
-        if counter >=1000:
-                if state:
-                    state = False
-                    gpio.output(PORT1_GATE1, state)
-                elif not state:
-                    state = True
-                    gpio.output(PORT1_GATE1, state)
-                counter = 0
-        else:
-            start_time = time.time()
-            voltage_num[0] = (adc_port[1].read_adc(0)) / 1023 * 5.3
+    start_time = time.time()
+    while ((time.time() - start_time)<= 0.5):
+            current_list0.append(conv_factor_current(adc_port[0].read_adc(0)))
 
-            currents_num[0] = conv_factor_current(adc_port[0].read_adc(0))
-            currents_num[1] = conv_factor_current(adc_port[0].read_adc(1))
-            currents_num[2] = conv_factor_current(adc_port[0].read_adc(2))
-            currents_num[3] = conv_factor_current(adc_port[0].read_adc(3))
-            currents_num[4] = conv_factor_current(adc_port[0].read_adc(4))
-            currents_num[5] = conv_factor_current(adc_port[0].read_adc(5))
-            currents_num[6] = conv_factor_current(adc_port[0].read_adc(6))
-            currents_num[7] = conv_factor_current(adc_port[0].read_adc(7))
+            power_list[0] = (conv_factor_current(adc_port[0].read_adc(1)))
+            power_list[1] = (conv_factor_current(adc_port[0].read_adc(2)))
 
-            power_inst[0] = voltage_num[0] * currents_num[0]
-            power_inst[1] = voltage_num[0] * currents_num[1]
-            power_inst[2] = voltage_num[0] * currents_num[2]
-            power_inst[3] = voltage_num[0] * currents_num[3]
-            power_inst[4] = voltage_num[0] * currents_num[4]
-            power_inst[5] = voltage_num[0] * currents_num[5]
-            power_inst[6] = voltage_num[0] * currents_num[6]
-            power_inst[7] = voltage_num[0] * currents_num[7]
+            voltage_list.append((adc_port[1].read_adc(0)) / 1023 * 5.3)
 
-            print("--- %s seconds ---" % (time.time() - start_time))
-            print(counter)
-            print('Voltage | {0:.4f} |'.format(*voltage_num))
-            print('Courant | {0:.4f} | {1:.4f} | {2:.4f} | {3:.4f} | {4:.4f} | {5:.4f} | {6:.4f} | {7:.4f} |'.format(
-                *currents_num))
-            print('Puissan | {0:.4f} | {1:.4f} | {2:.4f} | {3:.4f} | {4:.4f} | {5:.4f} | {6:.4f} | {7:.4f} |'.format(
-                *power_inst))
-            counter += 1
+            current_list1.append(conv_factor_current(adc_port[0].read_adc(3)))
+
+            power_list[3] = (conv_factor_current(adc_port[0].read_adc(4)))
+            power_list[4] = (conv_factor_current(adc_port[0].read_adc(5)))
+            power_list[5] = (conv_factor_current(adc_port[0].read_adc(6)))
+
+            current_list2.append(conv_factor_current(adc_port[0].read_adc(7)))
+
+
+
+
+
+
+    print("----VOLTAGE----")
+    print(range(len(voltage_list)))
+    for i in range(len(voltage_list)):
+        print(voltage_list[i])
+
+    print("----Current 0 ----")
+    print(len(current_list0))
+    for i in range(len(current_list0)):
+        print(current_list0[i])
+
+
+    print("----Current 1 ----")
+    print(len(current_list1))
+    for i in range(len(current_list1)):
+        print(current_list1[i])
+
+
+    print("----Current 2 ----")
+    print(len(current_list2))
+    for i in range(len(current_list2)):
+        print(current_list2[i])
+    print("done")
 
 
 # TODO
@@ -193,19 +199,13 @@ def main():
     adc_port = ADC_setup()
 
 
-    calculate_thread = threading.Thread(target=calculate_read, args=(v_inst_moy, I_inst_moy, P_inst_moy, adc_port, flag))
+    debug_adc_read(v_inst_moy, I_inst_moy,P_inst_moy, adc_port)
 
-
-    calculate_thread.start()
+    # calculate_thread = threading.Thread(target=calculate_read, args=(v_inst_moy, I_inst_moy, P_inst_moy, adc_port, flag))
+    # calculate_thread.start()
 
 
 
 
 
 main()
-
-
-
-
-
-

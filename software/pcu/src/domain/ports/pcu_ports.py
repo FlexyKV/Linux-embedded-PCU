@@ -85,7 +85,10 @@ def gpio_test_function():
 
     gpio_toggle_ON(0)
     sleep(1)
+
     gpio_toggle_OFF(0)
+    sleep(1)
+
 
 
     # #NO DELAY ON - OFF
