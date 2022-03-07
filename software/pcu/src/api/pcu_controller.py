@@ -15,6 +15,7 @@ pcu_service_repo.create_triggers()
 pcu_service = PcuService(pcu_service_repo)
 gpio_setup()
 
+#TODO handle not date
 
 @bp.route('/port_measures', methods=['GET'])
 def get_port_measures():
