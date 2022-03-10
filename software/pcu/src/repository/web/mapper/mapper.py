@@ -23,7 +23,6 @@ class MeasureMapper:
         self.min_measures = ()
         self.avg_measures = ()
 
-
     def __verify_start_time_record(self):
         start_timedelta = self.record_datetime[0] - self.start_time
         if start_timedelta.total_seconds() > 1.5:

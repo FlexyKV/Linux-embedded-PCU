@@ -1,5 +1,7 @@
 from flask import Flask
-from .api import pcu_controller
+from .web.api import record_controller, ports_controller
 
 app = Flask(__name__)
-app.register_blueprint(pcu_controller.bp)
+app.register_blueprint(record_controller.bp)
+app.register_blueprint(ports_controller.bp)
+
