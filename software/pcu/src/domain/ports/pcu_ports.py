@@ -54,11 +54,9 @@ def gpio_setup():
 def gpio_toggle_ON(gate_number):
     gate0 = "PORT" + str(gate_number) + "_GATE0"
     gate1 = "PORT" + str(gate_number) + "_GATE1"
-    print(gate0)
-    print(gate1)
-    gpio.output(globals()[gate1], False)
+    gpio.output(globals()[gate0], False)
     sleep(RELAY_DELAY)
-    gpio.output(globals()[gate0], True)
+    gpio.output(globals()[gate1], True)
     sleep(RELAY_DELAY)
     gpio.output(PORT_CONFIRM, True)
     sleep(RELAY_DELAY)
@@ -69,9 +67,9 @@ def gpio_toggle_ON(gate_number):
 def gpio_toggle_OFF(gate_number):
     gate0 = "PORT" + str(gate_number) + "_GATE0"
     gate1 = "PORT" + str(gate_number) + "_GATE1"
-    gpio.output(globals()[gate0], False)
+    gpio.output(globals()[gate1], False)
     sleep(RELAY_DELAY)
-    gpio.output(globals()[gate1], True)
+    gpio.output(globals()[gate0], True)
     sleep(RELAY_DELAY)
     gpio.output(PORT_CONFIRM, True)
     sleep(RELAY_DELAY)
@@ -84,10 +82,8 @@ def gpio_test_function():
     gpio_setup()
 
     gpio_toggle_ON(0)
-    sleep(1)
 
-    gpio_toggle_OFF(0)
-    sleep(1)
+    # gpio_toggle_OFF(0)
 
 
 

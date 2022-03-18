@@ -1,7 +1,9 @@
 import Adafruit_GPIO.GPIO as GPIO
 import Adafruit_GPIO.SPI as SPI
 import time
+import math
 import threading
+
 
 
 
@@ -80,26 +82,30 @@ def ADC_setup():
     adc_port = [mcp0, mcp1]
     return adc_port
 
+
+
 #Fonction permettant de faire la lecture des ADC ainsis que les calcules de conversion
 def calculate_read(voltage_num, currents_num, power_inst, adc_port):
-    def conv_factor_current(adc_data):
-        voltage_ref = (adc_port[1].read_adc(1)/1023 * 5.20)
-
-        retVal = ((((((adc_data)/1023 * 5.2)-voltage_ref)/110)*30)/0.053)/1.41
+    def conv_factor_current(adc_data, voltage_ref):
+        retVal = (adc_data-voltage_ref)/1023*5.32
         return retVal
 
     while(1):
-        start_time = time.time()
-        voltage_num[0] = (adc_port[1].read_adc(0))/1023 * 5.3
+        #start_time = time.time()
 
-        currents_num[0] = conv_factor_current(adc_port[0].read_adc(0))
-        currents_num[1] = conv_factor_current(adc_port[0].read_adc(1))
-        currents_num[2] = conv_factor_current(adc_port[0].read_adc(2))
-        currents_num[3] = conv_factor_current(adc_port[0].read_adc(3))
-        currents_num[4] = conv_factor_current(adc_port[0].read_adc(4))
-        currents_num[5] = conv_factor_current(adc_port[0].read_adc(5))
-        currents_num[6] = conv_factor_current(adc_port[0].read_adc(6))
-        currents_num[7] = conv_factor_current(adc_port[0].read_adc(7))
+        voltage_ref = (adc_port[1].read_adc(1))
+        currents_num[0] = conv_factor_current(adc_port[0].read_adc(0), voltage_ref)
+        currents_num[1] = conv_factor_current(adc_port[0].read_adc(1), voltage_ref)
+        currents_num[2] = conv_factor_current(adc_port[0].read_adc(2), voltage_ref)
+        currents_num[3] = conv_factor_current(adc_port[0].read_adc(3), voltage_ref)
+
+        voltage_num[0] = (adc_port[1].read_adc(0)) / 1023 * 5.32
+
+        currents_num[4] = conv_factor_current(adc_port[0].read_adc(4), voltage_ref)
+        currents_num[5] = conv_factor_current(adc_port[0].read_adc(5), voltage_ref)
+        currents_num[6] = conv_factor_current(adc_port[0].read_adc(6), voltage_ref)
+        currents_num[7] = conv_factor_current(adc_port[0].read_adc(7), voltage_ref)
+
 
         power_inst[0] = voltage_num[0]*currents_num[0]
         power_inst[1] = voltage_num[0]*currents_num[1]
@@ -110,10 +116,10 @@ def calculate_read(voltage_num, currents_num, power_inst, adc_port):
         power_inst[6] = voltage_num[0]*currents_num[6]
         power_inst[7] = voltage_num[0]*currents_num[7]
 
-        print("--- %s seconds ---" % (time.time() - start_time))
-        print('Voltage | {0:.4f} |'.format(*voltage_num))
-        print('Courant | {0:.4f} | {1:.4f} | {2:.4f} | {3:.4f} | {4:.4f} | {5:.4f} | {6:.4f} | {7:.4f} |'.format(*currents_num))
-        print('Puissan | {0:.4f} | {1:.4f} | {2:.4f} | {3:.4f} | {4:.4f} | {5:.4f} | {6:.4f} | {7:.4f} |'.format(*power_inst))
+        # print("--- %s seconds ---" % (time.time() - start_time))
+        # print('Voltage | {0:.4f} |'.format(*voltage_num))
+        # print('Courant | {0:.4f} | {1:.4f} | {2:.4f} | {3:.4f} | {4:.4f} | {5:.4f} | {6:.4f} | {7:.4f} |'.format(*currents_num))
+        # print('Puissan | {0:.4f} | {1:.4f} | {2:.4f} | {3:.4f} | {4:.4f} | {5:.4f} | {6:.4f} | {7:.4f} |'.format(*power_inst))
 
 
 #Fonction permettant de faire différent debug selon le niveau d'abtraction (branchement, lecture, encodage, etc..)
@@ -122,58 +128,61 @@ def debug_adc_read(voltage_num, currents_num, power_inst, adc_port):
     current_list0 = []
     current_list1 = []
     current_list2 = []
+    current_list3 = []
+    current_list4 = []
+    current_list5 = []
+    current_list6 = []
+    current_list7 = []
 
+    squareroot2 = math.sqrt(2)
+
+
+    temp_data = []
     power_list = [0] * 8
-    def conv_factor_current(adc_data):
-        voltage_ref = (adc_port[1].read_adc(1) / 1023 * 5.20)
-
-        retVal = ((((((adc_data) / 1023 * 5.2) - voltage_ref) / 110) * 30) / 0.053) / 1.41
+    def conv_factor_current(adc_data, voltage_ref):
+        retVal = (adc_data - 512) * 0.0284099 * squareroot2
+        #retVal = (adc_data - voltage_ref) * 0.030986
         return retVal
 
     start_time = time.time()
-    while ((time.time() - start_time)<= 0.5):
-            current_list0.append(conv_factor_current(adc_port[0].read_adc(0)))
+    while ((time.time() - start_time)<= 0.1):
+            voltage_ref = (adc_port[1].read_adc(1))
+            current_list0.append(conv_factor_current(adc_port[0].read_adc(0), voltage_ref))
+            #current_list0.append((adc_port[0].read_adc(0)))
 
-            power_list[0] = (conv_factor_current(adc_port[0].read_adc(1)))
-            power_list[1] = (conv_factor_current(adc_port[0].read_adc(2)))
+            current_list1.append(conv_factor_current(adc_port[0].read_adc(1), voltage_ref))
+            current_list2.append(conv_factor_current(adc_port[0].read_adc(2), voltage_ref))
+            current_list3.append(conv_factor_current(adc_port[0].read_adc(3), voltage_ref))
 
-            voltage_list.append((adc_port[1].read_adc(0)) / 1023 * 5.3)
+            #voltage_list.append(((adc_port[1].read_adc(0)-voltage_ref)/1023) * 5.32 * 90.2659)
+            voltage_list.append((((adc_port[1].read_adc(0)-510) / 1023) * 5.243)*67.315*squareroot2)
 
-            current_list1.append(conv_factor_current(adc_port[0].read_adc(3)))
-
-            power_list[3] = (conv_factor_current(adc_port[0].read_adc(4)))
-            power_list[4] = (conv_factor_current(adc_port[0].read_adc(5)))
-            power_list[5] = (conv_factor_current(adc_port[0].read_adc(6)))
-
-            current_list2.append(conv_factor_current(adc_port[0].read_adc(7)))
-
-
-
+            current_list4.append(conv_factor_current(adc_port[0].read_adc(4), voltage_ref))
+            current_list5.append(conv_factor_current(adc_port[0].read_adc(5), voltage_ref))
+            current_list6.append(conv_factor_current(adc_port[0].read_adc(6), voltage_ref))
+            current_list7.append(conv_factor_current(adc_port[0].read_adc(7), voltage_ref))
 
 
-
-    print("----VOLTAGE----")
-    print(range(len(voltage_list)))
     for i in range(len(voltage_list)):
-        print(voltage_list[i])
-
-    print("----Current 0 ----")
-    print(len(current_list0))
-    for i in range(len(current_list0)):
-        print(current_list0[i])
+        temp_data.append(current_list0[i] * voltage_list[i])
 
 
-    print("----Current 1 ----")
-    print(len(current_list1))
-    for i in range(len(current_list1)):
-        print(current_list1[i])
+    ret_val = sum(temp_data)/len(temp_data)
+    print("Powerdraw %4.2f - Current %3.2f - Voltage %3.2f" % ((ret_val, max(current_list0)/squareroot2, max(voltage_list)/squareroot2)))
+    #
+    # print("VOLTAGE ----------------------------")
+    # for i in range(len(voltage_list)):
+    #     print(voltage_list[i])
+    #
+    # print("CURRENT ----------------------------")
+    # for i in range(len(current_list0)):
+    #     print(current_list0[i])
 
-
-    print("----Current 2 ----")
-    print(len(current_list2))
-    for i in range(len(current_list2)):
-        print(current_list2[i])
-    print("done")
+    # ret_val = sum(current_list0)/len(current_list0)
+    # print(max(current_list0))
+    #
+    # print(sum(voltage_list))
+    # print(len(voltage_list))
 
 
 # TODO
@@ -198,11 +207,16 @@ def main():
 
     adc_port = ADC_setup()
 
+    #calculate_read(v_inst_moy, I_inst_moy, P_inst_moy, adc_port)
 
-    debug_adc_read(v_inst_moy, I_inst_moy,P_inst_moy, adc_port)
+    while(1):
+        debug_adc_read(v_inst_moy, I_inst_moy,P_inst_moy, adc_port)
 
-    # calculate_thread = threading.Thread(target=calculate_read, args=(v_inst_moy, I_inst_moy, P_inst_moy, adc_port, flag))
+
+    # calculate_thread = threading.Thread(target=calculate_read, args=(v_inst_moy, I_inst_moy, P_inst_moy, adc_port))
     # calculate_thread.start()
+
+
 
 
 
