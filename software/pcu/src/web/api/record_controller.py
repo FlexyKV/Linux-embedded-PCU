@@ -15,15 +15,13 @@ record_service = RecordService(record_repo)
 
 # TODO handle errors (not date..)
 
-@bp.route('/measures', methods=['POST'])
-def get_port_measures():
-    payload = json.loads(request.get_data())
-    return record_service.get_port_measures(payload["port_id"], payload["start_time"],
-                                         payload["end_time"], payload["period"])
+@bp.route('/port/<int:port_id>/start_time/<start_time>/end_time/<end_time>/period/<int:period>', methods=['GET'])
+def get_port_records(port_id, start_time, end_time, period):
+    return record_service.get_port_records(port_id, start_time, end_time, period)
 
 
-@bp.route('/measures', methods=['GET'])
-def get_instant_measures():
-    return record_service.get_instant_measures()
+@bp.route('/instant', methods=['GET'])
+def get_instant_record():
+    return record_service.get_instant_record()
 
 

@@ -73,7 +73,7 @@ python3 -m pipenv run adc
 Run server:
 
 ```
-python3 -m pipenv run server
+python3 -m pipenv run serve
 ```
 
 set launch file permissions (will be launched at boot)

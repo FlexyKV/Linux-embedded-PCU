@@ -127,3 +127,25 @@ def datetime_to_str(date: datetime) -> str:
     return date.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
 
+def parse_instant_record_to_json(record_datetime, record_port_states, measures):
+    instant_measures = {"datetime": datetime_to_str(record_datetime),
+                        "port_0": {"port_state": record_port_states[0], "port_current": measures[0][0],
+                                   "port_voltage": measures[0][1]},
+                        "port_1": {"port_state": record_port_states[1], "port_current": measures[1][0],
+                                   "port_voltage": measures[1][1]},
+                        "port_2": {"port_state": record_port_states[2], "port_current": measures[2][0],
+                                   "port_voltage": measures[2][1]},
+                        "port_3": {"port_state": record_port_states[3], "port_current": measures[3][0],
+                                   "port_voltage": measures[3][1]},
+                        "port_4": {"port_state": record_port_states[4], "port_current": measures[4][0],
+                                   "port_voltage": measures[4][1]},
+                        "port_5": {"port_state": record_port_states[5], "port_current": measures[5][0],
+                                   "port_voltage": measures[5][1]},
+                        "port_6": {"port_state": record_port_states[6], "port_current": measures[6][0],
+                                   "port_voltage": measures[6][1]},
+                        "port_7": {"port_state": record_port_states[7], "port_current": measures[7][0],
+                                   "port_voltage": measures[7][1]}}
+    return json.dumps(instant_measures)
+
+
+

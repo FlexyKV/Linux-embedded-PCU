@@ -2,7 +2,7 @@ import Adafruit_GPIO.GPIO as GPIO
 import Adafruit_GPIO.SPI as SPI
 import time
 import threading
-
+import matplotlib.pyplot as plt
 
 
 #Classe MCP3008 permettant d'instancier un objet ADC
