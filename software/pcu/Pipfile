@@ -10,6 +10,7 @@ Adafruit_GPIO = "*"
 gunicorn = "*"
 waitress = "*" # to delete, used to do local server tests on windows
 "RPi.GPIO" = "*"
+numpy = "*"
 
 [requires]
 python_version = "3"
