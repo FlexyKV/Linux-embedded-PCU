@@ -1,8 +1,7 @@
-import json
-from flask import request, Blueprint
+from flask import Blueprint
 from flask_cors import CORS
 from src.web.service.record_service import RecordService
-from src.repository.web.record_repository import RecordRepository
+from src.repository.record.record_repository import RecordRepository
 from src.repository.database_client.database_client import DatabaseClient
 
 bp = Blueprint('record', __name__, url_prefix='/record', )

@@ -1,5 +1,5 @@
-from src.repository.web.record_repository import RecordRepository
-from src.repository.web.mapper.mapper import parse_record_to_json, MeasureMapper, str_to_datetime, parse_instant_record_to_json
+from src.repository.record.record_repository import RecordRepository
+from src.repository.record.mapper.mapper import parse_record_to_json, MeasureMapper, str_to_datetime, parse_instant_record_to_json
 import json
 
 

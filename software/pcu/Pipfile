@@ -8,7 +8,9 @@ flask = "*"
 flask-cors = "*"
 Adafruit_GPIO = "*"
 gunicorn = "*"
+pyjwt = "*"
 "RPi.GPIO" = "*"
+
 
 [requires]
 python_version = "3"

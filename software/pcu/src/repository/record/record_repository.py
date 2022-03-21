@@ -1,6 +1,5 @@
 from datetime import datetime
 from src.repository.database_client.database_client import DatabaseClient
-from src.repository.web.mapper.mapper import str_to_datetime
 
 
 class RecordRepository:

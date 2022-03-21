@@ -1,5 +1,5 @@
-from src.repository.web.ports_repository import PortsRepository
-from src.repository.web.mapper.mapper import parse_port_state_to_json
+from src.repository.ports.ports_repository import PortsRepository
+from src.repository.record.mapper.mapper import parse_port_state_to_json
 from src.web.ports.pcu_ports import gpio_toggle_ON, gpio_toggle_OFF, gpio_setup
 
 

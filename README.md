@@ -81,3 +81,5 @@ set launch file permissions (will be launched at boot)
 ```
 chmod +x reset_database.sh run_adc.sh run_serve.sh run_bridge.sh
 ```
+
+apt-get install build-essential libssl-dev libffi-dev python3-dev cargo
