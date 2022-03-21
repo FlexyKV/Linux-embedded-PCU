@@ -2,19 +2,12 @@
 import logging
 import logging.handlers
 from datetime import datetime, timedelta
-
-from src.service.mapper.mapper import MeasureMapper
-
-#À mettre dans pcu_controller
-#pcu_logging_repo = PcuRepository(db_file_path)
-#pcu_logging = loggingSyslog("192.168.1.80", 514,pcu_logging_repo)
-#logging_thread = threading.Thread(target=pcu_logging.logging_valeurs())
-#logging_thread.start()
+from src.repository.record.mapper.mapper import MeasureMapper
 
 
 class loggingSyslog(object):
 
-    def __init__(self, address, port,repo):
+    def __init__(self, address, port, repo):
         self.address = address
         self.port = port
         self.repository = repo
