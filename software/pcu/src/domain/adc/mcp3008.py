@@ -107,23 +107,13 @@ def debug_adc_read(voltage_num, currents_num, power_inst, adc_port):
         currents_num[6] = conv_factor_current(adc_port[0].read_adc(6), voltage_ref)
         currents_num[7] = conv_factor_current(adc_port[0].read_adc(7), voltage_ref)
 
-
-        power_inst[0] = voltage_num[0]*currents_num[0]
-        power_inst[1] = voltage_num[0]*currents_num[1]
-        power_inst[2] = voltage_num[0]*currents_num[2]
-        power_inst[3] = voltage_num[0]*currents_num[3]
-        power_inst[4] = voltage_num[0]*currents_num[4]
-        power_inst[5] = voltage_num[0]*currents_num[5]
-        power_inst[6] = voltage_num[0]*currents_num[6]
-        power_inst[7] = voltage_num[0]*currents_num[7]
-
         # print("--- %s seconds ---" % (time.time() - start_time))
         # print('Voltage | {0:.4f} |'.format(*voltage_num))
         # print('Courant | {0:.4f} | {1:.4f} | {2:.4f} | {3:.4f} | {4:.4f} | {5:.4f} | {6:.4f} | {7:.4f} |'.format(*currents_num))
         # print('Puissan | {0:.4f} | {1:.4f} | {2:.4f} | {3:.4f} | {4:.4f} | {5:.4f} | {6:.4f} | {7:.4f} |'.format(*power_inst))
 
 
-#Fonction permettant de faire différent debug selon le niveau d'abtraction (branchement, lecture, encodage, etc..)
+#Fonction permettant de faire différent debug selon le niveau d'abstraction (branchement, lecture, encodage, etc..)
 def calculate_read(adc_port):
     voltage_list = []
     current_list0 = []
@@ -136,17 +126,16 @@ def calculate_read(adc_port):
     current_list7 = []
 
     squareroot2 = math.sqrt(2)                      # Squareroot of 2 to get peak value
-    raspberrypi_vdd = 5.243                         # Vdd output from the RPi (Has to be confirm if values are not precise)
+    raspberrypi_vdd = 5.22                       # Vdd output from the RPi (Has to be confirm if values are not precise)
     voltage_conv_factor = 67.315                    # Conversion factor to get V(peak)
     current_conv_factor = 0.0284099                 # Conversion factor to get I(peak)
-    sampling_period = 1.0                           # Sampling period in secondes
+    sampling_period = 0.5                           # Sampling period in secondes
 
 
-
-    power_list = [0] * 8
     def conv_factor_current(adc_data, voltage_ref):
-        if adc_data < 1:
-            retVal = (adc_data) * current_conv_factor * squareroot2
+                                                    # Eliminate noise at start of ADC_READ
+        if adc_data < 4:
+            retVal = 0 * current_conv_factor * squareroot2
         else:
             retVal = (adc_data - 512) * current_conv_factor * squareroot2
         return retVal
@@ -154,19 +143,20 @@ def calculate_read(adc_port):
     start_time = time.time()
     while ((time.time() - start_time)<= sampling_period):
 
-            voltage_ref = (adc_port[1].read_adc(1))
 
-            current_list0.append(conv_factor_current(adc_port[0].read_adc(0), voltage_ref))
-            current_list1.append(conv_factor_current(adc_port[0].read_adc(1), voltage_ref))
-            current_list2.append(conv_factor_current(adc_port[0].read_adc(2), voltage_ref))
-            current_list3.append(conv_factor_current(adc_port[0].read_adc(3), voltage_ref))
+        voltage_ref = (adc_port[1].read_adc(1))
 
-            voltage_list.append((((adc_port[1].read_adc(0)-510) / 1023) * raspberrypi_vdd) * voltage_conv_factor * squareroot2)
+        current_list0.append(conv_factor_current(adc_port[0].read_adc(0), voltage_ref))
+        current_list1.append(conv_factor_current(adc_port[0].read_adc(1), voltage_ref))
+        current_list2.append(conv_factor_current(adc_port[0].read_adc(2), voltage_ref))
+        current_list3.append(conv_factor_current(adc_port[0].read_adc(3), voltage_ref))
 
-            current_list4.append(conv_factor_current(adc_port[0].read_adc(4), voltage_ref))
-            current_list5.append(conv_factor_current(adc_port[0].read_adc(5), voltage_ref))
-            current_list6.append(conv_factor_current(adc_port[0].read_adc(6), voltage_ref))
-            current_list7.append(conv_factor_current(adc_port[0].read_adc(7), voltage_ref))
+        voltage_list.append((((adc_port[1].read_adc(0)-510) / 1023) * raspberrypi_vdd) * voltage_conv_factor * squareroot2)
+
+        current_list4.append(conv_factor_current(adc_port[0].read_adc(4), voltage_ref))
+        current_list5.append(conv_factor_current(adc_port[0].read_adc(5), voltage_ref))
+        current_list6.append(conv_factor_current(adc_port[0].read_adc(6), voltage_ref))
+        current_list7.append(conv_factor_current(adc_port[0].read_adc(7), voltage_ref))
 
     powerdraw0 = calculate_powerdraw(voltage_list, current_list0)
     powerdraw1 = calculate_powerdraw(voltage_list, current_list1)
@@ -181,7 +171,7 @@ def calculate_read(adc_port):
     signal_freq = calculate_signal_frequency(voltage_list, len(voltage_list), sampling_period)
 
     voltage_rms = max(voltage_list) / squareroot2
-    sampling_freq = len(voltage_list)
+    sampling_freq = len(voltage_list)/sampling_period
 
 
     print("Frequency %3.2f Hz - SamplingFreq %3.2f Hz" % (signal_freq, sampling_freq))
@@ -195,13 +185,18 @@ def calculate_read(adc_port):
     print("Port 7 : Powerdraw %4.2f W - Current %3.2f A - Voltage %3.2f V" % (powerdraw7, max(current_list7) / squareroot2, voltage_rms))
     print("-------------------------------------------------------------------------------------------------------------")
 
+
     # print("VOLTAGE ----------------------------")
     # for i in range(len(voltage_list)):
     #     print(voltage_list[i])
     #
     # print("CURRENT ----------------------------")
     # for i in range(len(current_list1)):
-    #     print(current_list1[i])
+    #     adc_port[0].read_adc(1)
+    #
+    # print("CURRENT MAX")
+    # print(max(test_list) / squareroot2)
+
 
     # ret_val = sum(current_list0)/len(current_list0)
     # print(max(current_list0))

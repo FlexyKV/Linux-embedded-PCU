@@ -77,6 +77,31 @@ def gpio_toggle_OFF(gate_number):
     print(f"port {gate_number} is off")
 
 
+def Port_stress_test():
+    # #NO DELAY ON - OFF
+    gpio_toggle_ON(1)
+    sleep(0)
+    gpio_toggle_OFF(1)
+    sleep(3)
+
+    #NO DELAY ON - OFF - ON
+    gpio_toggle_ON(1)
+    sleep(0)
+    gpio_toggle_OFF(1)
+    sleep(0)
+    gpio_toggle_ON(1)
+    sleep(3)
+
+    #ON - ON
+    gpio_toggle_ON(1)
+    sleep(3)
+
+    #OFF - OFF
+    gpio_toggle_OFF(1)
+    sleep(0.5)
+    gpio_toggle_OFF(1)
+
+
 def gpio_test_function():
     gpio.setwarnings(False)
     gpio_setup()
@@ -85,30 +110,6 @@ def gpio_test_function():
 
     # gpio_toggle_OFF(0)
 
-
-
-    # #NO DELAY ON - OFF
-    # gpio_toggle_ON(1)
-    # sleep(0)
-    # gpio_toggle_OFF(1)
-    # sleep(3)
-    #
-    # #NO DELAY ON - OFF - ON
-    # gpio_toggle_ON(1)
-    # sleep(0)
-    # gpio_toggle_OFF(1)
-    # sleep(0)
-    # gpio_toggle_ON(1)
-    # sleep(3)
-    #
-    # #ON - ON
-    # gpio_toggle_ON(1)
-    # sleep(3)
-    #
-    # #OFF - OFF
-    # gpio_toggle_OFF(1)
-    # sleep(0.5)
-    # gpio_toggle_OFF(1)
 
     print("success !!")
 
