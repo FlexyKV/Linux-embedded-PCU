@@ -36,7 +36,7 @@ class MeasureMapper:
     def __add_record_measures_to_period(self, index):
         self.record_current += self.measures[index][0]
         self.record_voltage += self.measures[index][1]
-        self.record_power += self.measures[index][0] * self.measures[index][1]
+        self.record_power += self.measures[index][2]
 
     def __verify_port_state_change(self, index):
         if self.record_port_states[index] != self.period_port_states[-1][1]:

@@ -9,7 +9,7 @@ from src.web.api.login_validation.login_validation import verify_token
 bp = Blueprint('ports', __name__, url_prefix='/port', )
 CORS(bp)
 
-db_client = DatabaseClient()
+db_client = DatabaseClient("port")
 ports_repo = PortsRepository(db_client)
 ports_service = PortsService(ports_repo)
 

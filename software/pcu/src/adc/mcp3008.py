@@ -9,6 +9,10 @@ import numpy as np
 
 
 #Classe MCP3008 permettant d'instancier un objet ADC
+from src.repository.adc.adc_repository import AdcRepository
+from src.repository.database_client.database_client import DatabaseClient
+
+
 class MCP3008(object):
     """Class to represent an Adafruit MCP3008 analog to digital converter.
     """
@@ -114,7 +118,7 @@ def debug_adc_read(voltage_num, currents_num, power_inst, adc_port):
 
 
 #Fonction permettant de faire différent debug selon le niveau d'abstraction (branchement, lecture, encodage, etc..)
-def calculate_read(adc_port):
+def calculate_read(adc_port, adc_repo):
     voltage_list = []
     current_list0 = []
     current_list1 = []
@@ -170,6 +174,12 @@ def calculate_read(adc_port):
 
     voltage_rms = max(voltage_list) / squareroot2
     sampling_freq = len(voltage_list)/sampling_period
+
+    currents_list = [max(current_list0) / squareroot2, max(current_list1) / squareroot2, max(current_list2) / squareroot2, max(current_list3) / squareroot2, max(current_list4) / squareroot2, max(current_list5) / squareroot2, max(current_list6) / squareroot2, max(current_list7) / squareroot2]
+    powerdraw_list = [powerdraw0, powerdraw1, powerdraw2, powerdraw3, powerdraw4, powerdraw5, powerdraw6, powerdraw7]
+
+    adc_repo.insert_port_measures(currents_list, voltage_rms, powerdraw_list)
+
 
     print("Frequency %3.2f Hz - SamplingFreq %3.2f Hz" % (signal_freq, sampling_freq))
     print("Port 0 : Powerdraw %4.2f W - Current %3.2f A - Voltage %3.2f V" % (powerdraw0, max(current_list0) / squareroot2, voltage_rms))
@@ -240,8 +250,21 @@ def main():
 
     #calculate_read(v_inst_moy, I_inst_moy, P_inst_moy, adc_port)
 
+    record_db_client = DatabaseClient("record")
+    try:
+        record_db_client.initialise_db()
+    except:
+        pass
+    port_db_client = DatabaseClient("port")
+    try:
+        port_db_client.initialise_db()
+    except:
+        pass
+
+    adc_repo = AdcRepository(record_db_client, port_db_client)
+
     while(1):
-        calculate_read(adc_port)
+        calculate_read(adc_port, adc_repo)
 
 
     # calculate_thread = threading.Thread(target=calculate_read, args=(v_inst_moy, I_inst_moy, P_inst_moy, adc_port))

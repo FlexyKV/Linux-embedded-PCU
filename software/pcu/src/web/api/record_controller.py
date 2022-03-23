@@ -7,7 +7,7 @@ from src.repository.database_client.database_client import DatabaseClient
 bp = Blueprint('record', __name__, url_prefix='/record', )
 CORS(bp)
 
-db_client = DatabaseClient()
+db_client = DatabaseClient("record")
 record_repo = RecordRepository(db_client)
 record_service = RecordService(record_repo)
 
