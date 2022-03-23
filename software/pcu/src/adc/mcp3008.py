@@ -143,7 +143,6 @@ def calculate_read(adc_port):
     start_time = time.time()
     while ((time.time() - start_time)<= sampling_period):
 
-
         voltage_ref = (adc_port[1].read_adc(1))
 
         current_list0.append(conv_factor_current(adc_port[0].read_adc(0), voltage_ref))
@@ -167,12 +166,10 @@ def calculate_read(adc_port):
     powerdraw6 = calculate_powerdraw(voltage_list, current_list6)
     powerdraw7 = calculate_powerdraw(voltage_list, current_list7)
 
-
     signal_freq = calculate_signal_frequency(voltage_list, len(voltage_list), sampling_period)
 
     voltage_rms = max(voltage_list) / squareroot2
     sampling_freq = len(voltage_list)/sampling_period
-
 
     print("Frequency %3.2f Hz - SamplingFreq %3.2f Hz" % (signal_freq, sampling_freq))
     print("Port 0 : Powerdraw %4.2f W - Current %3.2f A - Voltage %3.2f V" % (powerdraw0, max(current_list0) / squareroot2, voltage_rms))
