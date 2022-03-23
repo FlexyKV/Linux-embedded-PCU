@@ -58,6 +58,12 @@ sudo apt-get remove pipenv
 pip3 install pipenv
 ```
 
+Install sqlite3:
+
+```
+sudo apt-get install sqlite3
+```
+
 Run adc:
 
 ```
@@ -67,5 +73,13 @@ python3 -m pipenv run adc
 Run server:
 
 ```
-python3 -m pipenv run server
+python3 -m pipenv run serve
 ```
+
+set launch file permissions (will be launched at boot)
+
+```
+chmod +x reset_database.sh run_adc.sh run_serve.sh run_bridge.sh
+```
+
+apt-get install build-essential libssl-dev libffi-dev python3-dev cargo

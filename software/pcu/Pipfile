@@ -8,9 +8,10 @@ flask = "*"
 flask-cors = "*"
 Adafruit_GPIO = "*"
 gunicorn = "*"
-waitress = "*" # to delete, used to do local server tests on windows
+pyjwt = "*"
 "RPi.GPIO" = "*"
 numpy = "*"
+
 
 [requires]
 python_version = "3"
@@ -19,6 +20,5 @@ python_version = "3"
 serve = "gunicorn -b 0.0.0.0:5000 src:app"
 adc = "python src/domain/adc/mcp3008.py"
 adc_sim = "python src/run_adc_simulator.py"
-serve_ws = "waitress-serve --listen=0.0.0.0:5000 src:app" # to delete, used to do local server tests on windows
 gpio_toggle = "python src/domain/ports/pcu_ports.py"
 
