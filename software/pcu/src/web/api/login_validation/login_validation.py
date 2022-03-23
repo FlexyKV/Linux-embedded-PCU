@@ -18,7 +18,7 @@ def verify_authorization():
         token = request.headers['Authorization']
         try:
             jwt.decode(token, key, algorithms=algo_encryption)
-        except jwt.exceptions.DecodeError:
+        except:
             return False
     if not token:
         return False

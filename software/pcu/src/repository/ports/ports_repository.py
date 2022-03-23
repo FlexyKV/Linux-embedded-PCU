@@ -16,9 +16,10 @@ class PortsRepository:
 
     def update_port_state(self, port_id: int, port_state: int):
         with self.db as cur:
-            get_port_query = """UPDATE port SET port_state = ? WHERE id = ?"""
-            cur.execute(get_port_query, [port_state, port_id])
+            put_port_query = """UPDATE port SET port_state = ? WHERE id = ?"""
+            cur.execute(put_port_query, [port_state, port_id])
             get_port_query = """SELECT port_state FROM port WHERE id = ?"""
             cur.execute(get_port_query, [port_id])
             new_port_state = cur.fetchone()
+            self.db.save_on_disk()
         return new_port_state[0]
