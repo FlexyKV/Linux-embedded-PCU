@@ -2,7 +2,7 @@
 import logging
 import logging.handlers
 from datetime import datetime, timedelta
-from src.repository.record.mapper.mapper import MeasureMapper
+from src.repository.record.mapper.mapper import map_measures
 
 
 class loggingSyslog(object):
@@ -38,8 +38,7 @@ class loggingSyslog(object):
                 logging.info("Aucune valeur pour la dernière heure")
                 return 0
             else:
-                mapper = MeasureMapper(*port_data, 3600, start_time, end_time)
-                mapped_port_data = mapper.map_measures()
+                mapped_port_data = map_measures(*port_data, 3600)
                 port_avg_data.append((i, mapped_port_data[1], mapped_port_data[2]))
         #print(port_avg_data)
         return port_avg_data

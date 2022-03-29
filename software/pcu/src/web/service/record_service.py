@@ -1,5 +1,5 @@
 from src.repository.record.record_repository import RecordRepository
-from src.repository.record.mapper.mapper import parse_record_to_json, MeasureMapper, str_to_datetime, parse_instant_record_to_json
+from src.repository.record.mapper.mapper import parse_records_to_json, map_measures, str_to_datetime, parse_instant_record_to_json
 import json
 
 
@@ -8,13 +8,12 @@ class RecordService:
         self.repository = repository
 
     def get_port_records(self, port_id: int, start_time: str, end_time: str, period: int):
-        port_data = self.repository.get_port_records(port_id, str_to_datetime(start_time), str_to_datetime(end_time))
-        if port_data == -1:
+        port_records = self.repository.get_port_records(port_id, str_to_datetime(start_time), str_to_datetime(end_time))
+        if port_records == -1:
             return json.dumps({"error": "no data"})
 
-        mapper = MeasureMapper(*port_data, period, str_to_datetime(start_time), str_to_datetime(end_time))
-        mapped_port_data = mapper.map_measures()
-        return parse_record_to_json(mapped_port_data)
+        mapped_port_records = map_measures(*port_records, period)
+        return parse_records_to_json(mapped_port_records)
 
     def get_instant_record(self):
         instant_measures = self.repository.get_instant_record()

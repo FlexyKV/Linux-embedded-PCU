@@ -1,6 +1,17 @@
+import configparser
 import random
 import datetime
 from time import sleep
+
+CONFIG_FILE_PATH = "/home/pi/pcu/src/config/config.ini"
+
+#just for test
+def get_reference_voltage():
+    config = configparser.ConfigParser()
+    config.read(CONFIG_FILE_PATH)
+
+    reference_voltage = config["ADC"].getfloat("reference_voltage")
+    return reference_voltage
 
 
 class ADCSimulator:
@@ -14,13 +25,12 @@ class ADCSimulator:
 
     def save_measures(self):
         current_adc = []
-        voltage_adc = []
+        voltage_adc = random.uniform(3, 5)
         power_adc = []
         for value in range(8):
             #TODO
             #Modifier append pour optimiser vitesse
             current_adc.append(random.uniform(3, 5))
-            voltage_adc.append(random.uniform(3, 5))
             power_adc.append(random.uniform(5, 8))
         current_time = datetime.datetime.now()
         #Current_time: time(second) of the value
@@ -31,6 +41,7 @@ class ADCSimulator:
         elapsed_time = 0
         while True: #simulation_time - elapsed_time > 0:
             self.save_measures()
+            print(get_reference_voltage())
             elapsed_time += 1
             print(f"measure save {elapsed_time}")
             sleep(0.9)

@@ -1,7 +1,7 @@
 from repository.adc.adc_repository import AdcRepository
 from adc.adc_simulator import ADCSimulator
-from repository.database_client.database_client import DatabaseClient
-from src.config.config import database_type
+from repository.database_client.database_client import DatabaseClient, database_type
+
 
 record_db_client = DatabaseClient(database_type.record)
 record_db_client.initialise_db()
