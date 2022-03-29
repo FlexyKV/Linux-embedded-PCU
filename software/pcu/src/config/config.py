@@ -14,7 +14,7 @@ def get_login_password():
 def set_memory_type(mem_type):
     config = configparser.ConfigParser()
     config.read(CONFIG_FILE_PATH)
-    if mem_type != memory_type.ram.name and mem_type != memory_type.rom.name:
+    if mem_type != memory_type.ram.name and mem_type != memory_type.sd.name:
         return json.dumps({"error": "invalid database memory type"})
     config.set("DATABASE", "record_memory_type", mem_type)
     with open(CONFIG_FILE_PATH, 'w') as configfile:

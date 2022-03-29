@@ -20,7 +20,7 @@ class database_type(enum.Enum):
 
 
 class memory_type(enum.Enum):
-    rom = 1
+    sd = 1
     ram = 2
 
 
@@ -41,7 +41,7 @@ class DatabaseClient:
             self.db = PORT_DATABASE_PATH
             self.tables = PORT_DATABASE_TABLES
         elif database == database_type.record:
-            if get_record_memory_type() == memory_type.rom:
+            if get_record_memory_type() == memory_type.sd:
                 self.db = ROM_RECORD_DATABASE_PATH
             elif get_record_memory_type() == memory_type.ram:
                 self.db = RAM_RECORD_DATABASE_PATH
