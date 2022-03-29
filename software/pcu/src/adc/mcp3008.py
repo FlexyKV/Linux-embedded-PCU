@@ -3,14 +3,14 @@ import Adafruit_GPIO.SPI as SPI
 import time
 import math
 import threading
-import numpy as np
+# import numpy as np
 
 
 
 
 #Classe MCP3008 permettant d'instancier un objet ADC
-from src.repository.adc.adc_repository import AdcRepository
-from src.repository.database_client.database_client import DatabaseClient
+# from src.repository.adc.adc_repository import AdcRepository
+# from src.repository.database_client.database_client import DatabaseClient
 
 
 class MCP3008(object):
@@ -118,7 +118,7 @@ def debug_adc_read(voltage_num, currents_num, power_inst, adc_port):
 
 
 #Fonction permettant de faire différent debug selon le niveau d'abstraction (branchement, lecture, encodage, etc..)
-def calculate_read(adc_port, adc_repo):
+def calculate_read(adc_port, adc_repo, reference_voltage):
     voltage_list = []
     current_list0 = []
     current_list1 = []
@@ -170,7 +170,7 @@ def calculate_read(adc_port, adc_repo):
     powerdraw6 = calculate_powerdraw(voltage_list, current_list6)
     powerdraw7 = calculate_powerdraw(voltage_list, current_list7)
 
-    signal_freq = calculate_signal_frequency(voltage_list, len(voltage_list), sampling_period)
+    signal_freq = (voltage_list, len(voltage_list), sampling_period)
 
     voltage_rms = max(voltage_list) / squareroot2
     sampling_freq = len(voltage_list)/sampling_period
@@ -219,22 +219,22 @@ def calculate_powerdraw(voltage_list, current_list):
     ret_val = sum(temp_data)/len(temp_data)
     return ret_val
 
-
-def calculate_signal_frequency(signal, fs, sampling_period):
-
-    t = np.linspace(0, 2 * np.pi, fs)
-
-    y_fft = np.fft.fft(signal)                  # Original FFT
-    y_fft = y_fft[:round(len(t) / 2)]           # First half ( pos freqs )
-    y_fft = np.abs(y_fft)                       # Absolute value of magnitudes
-    y_fft = y_fft / max(y_fft)                  # Normalized so max = 1
-
-    freq_x_axis = np.linspace(0, fs / 2, len(y_fft))
-
-    f_loc = np.argmax(y_fft)                    # Finds the index of the max
-    f_val = freq_x_axis[f_loc]                  # The strongest frequency value
-
-    return f_val/sampling_period
+#
+# def calculate_signal_frequency(signal, fs, sampling_period):
+#
+#     t = np.linspace(0, 2 * np.pi, fs)
+#
+#     y_fft = np.fft.fft(signal)                  # Original FFT
+#     y_fft = y_fft[:round(len(t) / 2)]           # First half ( pos freqs )
+#     y_fft = np.abs(y_fft)                       # Absolute value of magnitudes
+#     y_fft = y_fft / max(y_fft)                  # Normalized so max = 1
+#
+#     freq_x_axis = np.linspace(0, fs / 2, len(y_fft))
+#
+#     f_loc = np.argmax(y_fft)                    # Finds the index of the max
+#     f_val = freq_x_axis[f_loc]                  # The strongest frequency value
+#
+#     return f_val/sampling_period
 
 
 
@@ -243,28 +243,6 @@ def get_data_API():
     pass
 
 
-def main():
-
-
-    adc_port = ADC_setup()
-
-    #calculate_read(v_inst_moy, I_inst_moy, P_inst_moy, adc_port)
-
-    record_db_client = DatabaseClient("record")
-    try:
-        record_db_client.initialise_db()
-    except:
-        pass
-    port_db_client = DatabaseClient("port")
-    try:
-        port_db_client.initialise_db()
-    except:
-        pass
-
-    adc_repo = AdcRepository(record_db_client, port_db_client)
-
-    while(1):
-        calculate_read(adc_port, adc_repo)
 
 
     # calculate_thread = threading.Thread(target=calculate_read, args=(v_inst_moy, I_inst_moy, P_inst_moy, adc_port))
@@ -274,6 +252,3 @@ def main():
 
 
 
-
-
-main()

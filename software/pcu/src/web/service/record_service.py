@@ -18,4 +18,7 @@ class RecordService:
 
     def get_instant_record(self):
         instant_measures = self.repository.get_instant_record()
+        if instant_measures == -1:
+            return json.dumps({"error": "no data"})
+
         return parse_instant_record_to_json(*instant_measures)

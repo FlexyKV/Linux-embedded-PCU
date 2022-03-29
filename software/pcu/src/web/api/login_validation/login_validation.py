@@ -1,13 +1,14 @@
 from flask import request, make_response
 from functools import wraps
 import jwt
+from src.config.config import get_login_password
 
-key = "admin"
+
 algo_encryption = "HS256"
 
 
 def validate_access(passwd):
-    if passwd == key:
+    if passwd == get_login_password():
         return True
     return False
 
@@ -17,7 +18,7 @@ def verify_authorization():
     if 'Authorization' in request.headers:
         token = request.headers['Authorization']
         try:
-            jwt.decode(token, key, algorithms=algo_encryption)
+            jwt.decode(token, get_login_password(), algorithms=algo_encryption)
         except:
             return False
     if not token:
