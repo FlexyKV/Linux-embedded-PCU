@@ -10,15 +10,15 @@ Adafruit_GPIO = "*"
 gunicorn = "*"
 pyjwt = "*"
 "RPi.GPIO" = "*"
-#numpy = "1.16"
+numpy = "*"
 
 
 [requires]
-python_version = "3.7"
+python_version = "3.9.2"
 
 [scripts]
 serve = "gunicorn -b 0.0.0.0:5000 src:app"
 adc = "python src/run_adc.py"
 adc_sim = "python src/run_adc_simulator.py"
-gpio_toggle = "python src/domain/ports/pcu_ports.py"
-
+gpio_toggle = "python src/web/ports/pcu_ports.py"
+adc_hardware = "python src/adc/mcp3008.py"
