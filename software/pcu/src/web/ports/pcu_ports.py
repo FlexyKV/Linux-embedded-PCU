@@ -12,8 +12,8 @@ PORT3_GATE0 = 29
 PORT3_GATE1 = 22
 PORT4_GATE0 = 18
 PORT4_GATE1 = 15
-PORT5_GATE0 = 13
-PORT5_GATE1 = 16
+PORT5_GATE0 = 16
+PORT5_GATE1 = 13
 PORT6_GATE0 = 11
 PORT6_GATE1 = 7
 PORT7_GATE0 = 5
@@ -22,7 +22,7 @@ PORT_CONFIRM = 35
 PORT_ANTICONFIRM = 40
 
 #NECESSARY DELAY FOR THE RT314F12 RELAY GATE AND MOSFET DELAY (seconds)
-RELAY_DELAY = 0.05
+RELAY_DELAY = 0.1
 
 
 def gpio_setup():
@@ -30,7 +30,7 @@ def gpio_setup():
     gpio.setmode(gpio.BOARD)
     #Setup ANTICONFIRM TO FALSE SO THAT NO RELAY WILL CHANGE STATE IF NOISE
     gpio.setup(PORT_ANTICONFIRM, gpio.OUT)
-    gpio.setup(PORT_ANTICONFIRM, False)
+    gpio.output(PORT_ANTICONFIRM, False)
     gpio.setup(PORT_CONFIRM, gpio.OUT)
     gpio.setup(PORT0_GATE0, gpio.OUT)
     gpio.setup(PORT0_GATE1, gpio.OUT)
@@ -106,12 +106,11 @@ def gpio_test_function():
     gpio.setwarnings(False)
     gpio_setup()
 
-    #gpio_toggle_ON(0)
-
-    gpio_toggle_OFF(0)
+    gpio_toggle_ON(2)
 
 
     print("success !!")
+
 
 
 if __name__ == "__main__":

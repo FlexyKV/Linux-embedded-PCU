@@ -8,12 +8,9 @@ import threading
 import numpy as np
 
 
-
-
 #Classe MCP3008 permettant d'instancier un objet ADC
 # from src.repository.adc.adc_repository import AdcRepository
 # from src.repository.database_client.database_client import DatabaseClient
-
 
 class MCP3008(object):
     """Class to represent an Adafruit MCP3008 analog to digital converter.
@@ -91,32 +88,6 @@ def ADC_setup():
 
 
 
-#Fonction permettant de faire la lecture des ADC ainsis que les calcules de conversion
-def debug_adc_read(voltage_num, currents_num, power_inst, adc_port):
-    def conv_factor_current(adc_data, voltage_ref):
-        retVal = (adc_data-voltage_ref)/1023*5.32
-        return retVal
-
-    while(1):
-        #start_time = time.time()
-
-        voltage_ref = (adc_port[1].read_adc(1))
-        currents_num[0] = conv_factor_current(adc_port[0].read_adc(0), voltage_ref)
-        currents_num[1] = conv_factor_current(adc_port[0].read_adc(1), voltage_ref)
-        currents_num[2] = conv_factor_current(adc_port[0].read_adc(2), voltage_ref)
-        currents_num[3] = conv_factor_current(adc_port[0].read_adc(3), voltage_ref)
-
-        voltage_num[0] = (adc_port[1].read_adc(0)) / 1023 * 5.32
-
-        currents_num[4] = conv_factor_current(adc_port[0].read_adc(4), voltage_ref)
-        currents_num[5] = conv_factor_current(adc_port[0].read_adc(5), voltage_ref)
-        currents_num[6] = conv_factor_current(adc_port[0].read_adc(6), voltage_ref)
-        currents_num[7] = conv_factor_current(adc_port[0].read_adc(7), voltage_ref)
-
-        # print("--- %s seconds ---" % (time.time() - start_time))
-        # print('Voltage | {0:.4f} |'.format(*voltage_num))
-        # print('Courant | {0:.4f} | {1:.4f} | {2:.4f} | {3:.4f} | {4:.4f} | {5:.4f} | {6:.4f} | {7:.4f} |'.format(*currents_num))
-        # print('Puissan | {0:.4f} | {1:.4f} | {2:.4f} | {3:.4f} | {4:.4f} | {5:.4f} | {6:.4f} | {7:.4f} |'.format(*power_inst))
 
 
 #Fonction permettant de faire différent debug selon le niveau d'abstraction (branchement, lecture, encodage, etc..)
@@ -133,7 +104,7 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
 
     squareroot2 = math.sqrt(2)                      # Squareroot of 2 to get peak value
     raspberrypi_vdd = voltage_ref                   # Vdd output from the RPi (Has to be confirm if values are not precise)
-    voltage_conv_factor = 67.315                    # Conversion factor to get V(peak)
+    voltage_conv_factor = 67                   # Conversion factor to get V(peak)
     current_conv_factor = 0.0284099                 # Conversion factor to get I(peak)
     sampling_period = 1.0                           # Sampling period in secondes
 
@@ -156,6 +127,8 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
         current_list3.append(conv_factor_current(adc_port[0].read_adc(3), voltage_ref))
 
         voltage_list.append((((adc_port[1].read_adc(0)-510) / 1023) * raspberrypi_vdd) * voltage_conv_factor * squareroot2)
+
+
 
         current_list4.append(conv_factor_current(adc_port[0].read_adc(4), voltage_ref))
         current_list5.append(conv_factor_current(adc_port[0].read_adc(5), voltage_ref))
@@ -183,7 +156,7 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
 
 
     print("Frequency %3.2f Hz - SamplingFreq %3.2f Hz" % (signal_freq, sampling_freq))
-    print("Port 0 : Powerdraw %4.2f W - Current %3.2f A %3.2f - Voltage %3.2f V" % (powerdraw0, max(current_list0) / squareroot2, adc_port[0].read_adc(0), voltage_ref))
+    print("Port 0 : Powerdraw %4.2f W - Current %3.2f A - Voltage %3.2f V" % (powerdraw0, max(current_list0) / squareroot2, voltage_rms))
     print("Port 1 : Powerdraw %4.2f W - Current %3.2f A - Voltage %3.2f V" % (powerdraw1, max(current_list1) / squareroot2, voltage_rms))
     print("Port 2 : Powerdraw %4.2f W - Current %3.2f A - Voltage %3.2f V" % (powerdraw2, max(current_list2) / squareroot2, voltage_rms))
     print("Port 3 : Powerdraw %4.2f W - Current %3.2f A - Voltage %3.2f V" % (powerdraw3, max(current_list3) / squareroot2, voltage_rms))
@@ -197,7 +170,7 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
     # print("VOLTAGE ----------------------------")
     # for i in range(len(voltage_list)):
     #     print(voltage_list[i])
-    #
+
     # print("CURRENT ----------------------------")
     # for i in range(len(current_list1)):
     #     adc_port[0].read_adc(1)
