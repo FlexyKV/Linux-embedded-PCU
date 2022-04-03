@@ -103,14 +103,14 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
     current_list5 = []
     current_list6 = []
     current_list7 = []
-    ports_states = [1,1,1,1,1,1,1,1]
+    ports_states = [1, 1, 1, 1, 1, 1, 1, 1]
 
     squareroot2 = math.sqrt(2)                      # Squareroot of 2 to get peak value
     raspberrypi_vdd = voltage_ref                   # Vdd output from the RPi (Has to be confirm if values are not precise)
     voltage_conv_factor = 65.5                      # Conversion factor to get V(peak)
     current_conv_factor_port0 = 0.0284099           # Conversion factor to get I(peak) (Due tu resistance precision, every port has to be configure differently)
     current_conv_factor_port1 = 0.0284099
-    current_conv_factor_port2 = 0.0284099
+    current_conv_factor_port2 = 0.0266359
     current_conv_factor_port3 = 0.0301245
     current_conv_factor_port4 = 0.0303976
     current_conv_factor_port5 = 0.0308991
@@ -126,6 +126,34 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
             retVal = (adc_data - voltage_ref) * port * squareroot2
         return retVal
 
+    def calculate_current(current_list):
+        size_list = len(current_list)
+        temp_data = [None]*size_list
+        for i in range(size_list):
+            temp_data[i] = math.pow(current_list[i], 2)
+        ret_val = math.sqrt(sum(temp_data)/size_list)
+        return ret_val
+
+    def calculate_powerdraw(voltage_list, current_list):
+        temp_data = []
+        for i in range(len(voltage_list)):
+            temp_data.append(current_list[i] * voltage_list[i])
+        #     print(temp_data[i])
+        #
+        # print("VOLTAGE---------------------------------")
+        # for i in range(len(voltage_list)):
+        #     print(voltage_list[i])
+        #
+        # print("CURRENT---------------------------------")
+        # for i in range(len(current_list)):
+        #     print(current_list[i])
+
+        ret_val = sum(temp_data) / len(temp_data)
+        if ret_val < 0:
+            ret_val = 0
+
+        return ret_val
+
     start_time = time.time()
     while ((time.time() - start_time)<= sampling_period):
 
@@ -137,8 +165,6 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
         current_list3.append(conv_factor_current(adc_port[0].read_adc(3), voltage_ref, current_conv_factor_port3))
 
         voltage_list.append((((adc_port[1].read_adc(0)-510) / 1023) * raspberrypi_vdd) * voltage_conv_factor * squareroot2)
-
-
 
         current_list4.append(conv_factor_current(adc_port[0].read_adc(4), voltage_ref, current_conv_factor_port4))
         current_list5.append(conv_factor_current(adc_port[0].read_adc(5), voltage_ref, current_conv_factor_port5))
@@ -155,15 +181,27 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
     powerdraw7 = abs(calculate_powerdraw(voltage_list, current_list7))
 
     signal_freq = calculate_signal_frequency(voltage_list, len(voltage_list), sampling_period)
-
-    voltage_rms = max(voltage_list) / squareroot2
     sampling_freq = len(voltage_list)/sampling_period
 
+    voltage_rms = max(voltage_list) / squareroot2
 
-    currents_list = [(max(current_list0) / squareroot2)*ports_states[0], (max(current_list1) / squareroot2)*ports_states[1],
-                     (max(current_list2) / squareroot2)*ports_states[2], (max(current_list3) / squareroot2)*ports_states[3],
-                     (max(current_list4) / squareroot2)*ports_states[4], (max(current_list5) / squareroot2)*ports_states[5],
-                     (max(current_list6) / squareroot2)*ports_states[6], (max(current_list7) / squareroot2)*ports_states[7]]
+    current0 = calculate_current(current_list0)
+    current1 = calculate_current(current_list1)
+    current2 = calculate_current(current_list2)
+    current3 = calculate_current(current_list3)
+    current4 = calculate_current(current_list4)
+    current5 = calculate_current(current_list5)
+    current6 = calculate_current(current_list6)
+    current7 = calculate_current(current_list7)
+
+    # currents_list = [(max(current_list0) / squareroot2)*ports_states[0], (max(current_list1) / squareroot2)*ports_states[1],
+    #                  (max(current_list2) / squareroot2)*ports_states[2], (max(current_list3) / squareroot2)*ports_states[3],
+    #                  (max(current_list4) / squareroot2)*ports_states[4], (max(current_list5) / squareroot2)*ports_states[5],
+    #                  (max(current_list6) / squareroot2)*ports_states[6], (max(current_list7) / squareroot2)*ports_states[7]]
+
+    currents_list = [current0 * ports_states[0], current1 * ports_states[1], current2 * ports_states[2],
+                     current3 * ports_states[3], current4 * ports_states[4], current5 * ports_states[5],
+                     current6 * ports_states[6], current7 * ports_states[7]]
 
     powerdraw_list = [powerdraw0*ports_states[0], powerdraw1*ports_states[1], powerdraw2*ports_states[2],
                       powerdraw3*ports_states[3], powerdraw4*ports_states[4], powerdraw5*ports_states[5],
@@ -202,25 +240,7 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
     # print(len(voltage_list))
 
 
-def calculate_powerdraw(voltage_list, current_list):
-    temp_data = []
-    for i in range(len(voltage_list)):
-        temp_data.append(current_list[i] * voltage_list[i])
-    #     print(temp_data[i])
-    #
-    # print("VOLTAGE---------------------------------")
-    # for i in range(len(voltage_list)):
-    #     print(voltage_list[i])
-    #
-    # print("CURRENT---------------------------------")
-    # for i in range(len(current_list)):
-    #     print(current_list[i])
 
-    ret_val = sum(temp_data)/len(temp_data)
-    if ret_val < 0:
-        ret_val = 0
-
-    return ret_val
 
 
 def calculate_signal_frequency(signal, fs, sampling_period):
