@@ -17,19 +17,16 @@ class loggingSyslog(object):
         syslog = logging.handlers.SysLogHandler(address=(self.address, self.port))
         logger.addHandler(syslog)
 
-    def logging_valeurs(self):
-        all_avg_mesures = self.get_avg_mesure()
+    def log_values(self, hours):
+        all_avg_mesures = self.get_avg_mesure(hours)
         for i in range(8):
             #logging.info("Port:" , all_avg_mesures[i][0], "Power avg:", (all_avg_mesures[i][1].pop() * all_avg_mesures[i][2].pop()) )
             print("Port:", all_avg_mesures[i][0],
                          "Power avg:",(all_avg_mesures[i][1].pop() * all_avg_mesures[i][2].pop()),"W")
 
-        #threading.Timer(10.0, self.logging_valeurs).start()
-
-
-    def get_avg_mesure(self):
+    def get_avg_mesure(self, hours):
         end_time = datetime.now()
-        start_time = end_time - timedelta(hours=1, minutes=0)
+        start_time = end_time - timedelta(hours=hours, minutes=0)
         port_avg_data = []
         for i in range(8):
             port_data = self.repository.get_port_measures(i, start_time, end_time)

@@ -5,7 +5,7 @@ from src.web.api.login_validation.login_validation import verify_token
 from src.web.service.record_service import RecordService
 from src.repository.record.record_repository import RecordRepository
 from src.repository.database_client.database_client import DatabaseClient, database_type
-from src.config.config import set_memory_type
+from src.config.config import set_memory_type, set_log_ip, set_log_port
 
 bp = Blueprint('record', __name__, url_prefix='/record', )
 CORS(bp)
@@ -26,11 +26,4 @@ def get_port_records(port_id, start_time, end_time, period):
 @bp.route('/instant', methods=['GET'])
 def get_instant_record():
     return record_service.get_instant_record()
-
-
-@bp.route('/memory_type/<mem_type>', methods=['PUT'])
-@verify_token
-def put_memory_type(mem_type):
-    return set_memory_type(mem_type)
-
 

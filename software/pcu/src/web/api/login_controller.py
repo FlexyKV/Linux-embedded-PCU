@@ -23,9 +23,3 @@ def login(password):
         return json.dumps(response)
 
     return make_response('Wrong password', 401, {'WWW-Authenticate': 'Basic realm="Login required"'})
-
-
-@bp.route('/modify/<password>', methods=['PUT'])
-@verify_token
-def put_reference_voltage(password):
-    return set_login_password(password)

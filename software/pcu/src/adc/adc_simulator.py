@@ -41,8 +41,8 @@ class ADCSimulator:
         elapsed_time = 0
         while True: #simulation_time - elapsed_time > 0:
             self.save_measures()
-            print(get_reference_voltage())
+            # print(get_reference_voltage())
             elapsed_time += 1
-            print(f"measure save {elapsed_time}")
+            # print(f"measure save {elapsed_time}")
             sleep(0.9)
         # print("launch end")

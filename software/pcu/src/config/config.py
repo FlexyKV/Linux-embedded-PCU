@@ -1,6 +1,7 @@
-import enum
 import configparser
 import json
+import os
+
 from src.repository.database_client.database_client import memory_type, CONFIG_FILE_PATH
 
 
@@ -39,3 +40,25 @@ def set_login_password(password):
         config.write(configfile)
     return json.dumps({"status": 200})
 
+
+def set_log_ip(log_server_ip):
+    config = configparser.ConfigParser()
+    config.read(CONFIG_FILE_PATH)
+    config.set("APP", "log_server_ip", log_server_ip)
+    with open(CONFIG_FILE_PATH, 'w') as configfile:
+        config.write(configfile)
+    return json.dumps({"status": 200})
+
+
+def set_log_port(log_server_port):
+    config = configparser.ConfigParser()
+    config.read(CONFIG_FILE_PATH)
+    config.set("APP", "log_server_port", log_server_port)
+    with open(CONFIG_FILE_PATH, 'w') as configfile:
+        config.write(configfile)
+    return json.dumps({"status": 200})
+
+
+def reboot_pcu():
+    os.system("sudo reboot &")
+    return json.dumps({"status": 200})

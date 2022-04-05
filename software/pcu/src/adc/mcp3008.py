@@ -64,9 +64,6 @@ def ADC_setup():
     return adc_port
 
 
-
-
-
 #Fonction permettant de faire différent debug selon le niveau d'abstraction (branchement, lecture, encodage, etc..)
 def calculate_read(adc_port, adc_repo, voltage_ref):
     voltage_list = []
@@ -165,7 +162,6 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
     powerdraw6 = abs(calculate_powerdraw(voltage_list, current_list6, current_PowerCal_factor_port6))
     powerdraw7 = abs(calculate_powerdraw(voltage_list, current_list7, current_PowerCal_factor_port7))
 
-    signal_freq = calculate_signal_frequency(voltage_list, len(voltage_list), sampling_period)
     sampling_freq = len(voltage_list)/sampling_period
 
     voltage_rms = max(voltage_list) / squareroot2
@@ -195,7 +191,7 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
     adc_repo.insert_port_measures(datetime.now(), currents_list, voltage_rms, powerdraw_list)
 
 
-    print("Frequency %3.2f Hz - SamplingFreq %3.2f Hz" % (signal_freq, sampling_freq))
+    # print("Frequency %3.2f Hz - SamplingFreq %3.2f Hz" % (signal_freq, sampling_freq))
     print("Port 0 : Powerdraw %4.2f W - Current %3.2f A - Voltage %3.2f V" % (powerdraw0*ports_states[0], current0*ports_states[0], voltage_rms))
     print("Port 1 : Powerdraw %4.2f W - Current %3.2f A - Voltage %3.2f V" % (powerdraw1*ports_states[1], current1*ports_states[1], voltage_rms))
     print("Port 2 : Powerdraw %4.2f W - Current %3.2f A - Voltage %3.2f V" % (powerdraw2*ports_states[2], current2*ports_states[2], voltage_rms))
@@ -223,26 +219,6 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
     #
     # print(sum(voltage_list))
     # print(len(voltage_list))
-
-
-
-
-
-def calculate_signal_frequency(signal, fs, sampling_period):
-
-    t = np.linspace(0, 2 * np.pi, fs)
-
-    y_fft = np.fft.fft(signal)                  # Original FFT
-    y_fft = y_fft[:round(len(t) / 2)]           # First half ( pos freqs )
-    y_fft = np.abs(y_fft)                       # Absolute value of magnitudes
-    y_fft = y_fft / max(y_fft)                  # Normalized so max = 1
-
-    freq_x_axis = np.linspace(0, fs / 2, len(y_fft))
-
-    f_loc = np.argmax(y_fft)                    # Finds the index of the max
-    f_val = freq_x_axis[f_loc]                  # The strongest frequency value
-
-    return f_val/sampling_period
 
 
 

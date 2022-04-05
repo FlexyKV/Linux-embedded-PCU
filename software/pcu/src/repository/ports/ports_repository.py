@@ -1,4 +1,4 @@
-from src.repository.database_client.database_client import DatabaseClient
+from ..database_client.database_client import DatabaseClient
 
 
 class PortsRepository:
@@ -21,5 +21,4 @@ class PortsRepository:
             get_port_query = """SELECT port_state FROM port WHERE id = ?"""
             cur.execute(get_port_query, [port_id])
             new_port_state = cur.fetchone()
-            # self.db.save_on_disk()
         return new_port_state[0]
