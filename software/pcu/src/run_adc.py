@@ -15,7 +15,6 @@ def get_reference_voltage():
 record_db_client = DatabaseClient(database_type.record)
 record_db_client.initialise_db()
 port_db_client = DatabaseClient(database_type.port)
-port_db_client.initialise_db()
 adc_repo = AdcRepository(record_db_client, port_db_client)
 
 

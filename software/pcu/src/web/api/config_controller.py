@@ -1,5 +1,4 @@
-import json
-from flask import request, Blueprint
+from flask import Blueprint
 from flask_cors import CORS
 from src.web.api.login_validation.login_validation import verify_token
 from src.config.config import set_reference_voltage, set_memory_type, set_log_ip, set_log_port, set_login_password, \

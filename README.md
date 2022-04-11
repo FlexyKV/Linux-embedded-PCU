@@ -1,85 +1,115 @@
-# Linux-embeded-PCU
-Open Source Linux embedder power control unit with python API
+# Linux-embedded-PCU
+Open Source Linux embedded power control unit with python API and UI for convivial control and monitoring.
 
-## Software
+## Description
+TODO
+## Installation
 
-This project has an independent API that controls the PCU and a linked UI for convivial control and monitoring.
+### OS
 
-### Interface
+Use Raspberry Pi imager to write Raspbian Lite OS on your SD card
 
-description
+Connect Pi to a screen and keyboard
 
-image
+### Raspbian settings
 
-### API
-
-description
-
-image
-
-## Hardware
-
-description
-
-### Raspberry Pi 4B
-
-description
-
-image
-
-### USB Ethernet port
-
-description
-
-image
-
-### How to use project
-
-#### On work computer
-
-Connect ssh:
+Update Raspbian
 
 ```
-ssh pi@pcu.local 
+sudo apt-get update
+sudo apt-get upgrade
 ```
 
-Sync file:
+Go to config:
 
 ```
-scp -prq pcu pi@pcu.local:/home/pi
+sudo raspi-config
 ```
 
-#### On Raspberry Pi
+In system options, set a new password, and a desired PCU hostname
+
+In interface options, enable SPI and SSH
+
+Reboot system
+
+### Install dependencies
+
+Install pip3
+
+```
+sudo apt-get install python3-pip
+```
 
 Install pipenv:
 
 ```
-sudo apt-get remove pipenv
 pip3 install pipenv
 ```
 
-Install sqlite3:
+Install bridge-utils
 
 ```
-sudo apt-get install sqlite3
+sudo apt-get install bridge-utils
 ```
 
-Run adc:
+### Sync PCU files
+
+Clone Linux-embedded repository and copy files (here using SSH)
+
+For Windows use scp:
 
 ```
-python3 -m pipenv run adc
+scp -prq software/pcu pi@{hostname}.local:/home/pi
 ```
 
-Run server:
+For linux you can use ssh-copy
+
+### Setup launch
+
+On the Pi, set up the pipenv virtual environment
 
 ```
-python3 -m pipenv run serve
+cd pcu
+python3 -m pipenv install
 ```
 
-set launch file permissions (will be launched at boot)
+Use crontab to launch PCU at boot
 
 ```
-chmod +x reset_database.sh run_adc.sh run_serve.sh run_bridge.sh
+crontab -e
 ```
 
-apt-get install build-essential libssl-dev libffi-dev python3-dev cargo
+Add commands at the end of the cron file and save
+
+```
+@reboot cd /home/pi/pcu && python3 -m pipenv run db_init > /home/pi/log.txt
+@reboot cd /home/pi/pcu && python3 -m pipenv run adc > /home/pi/log.txt
+@reboot cd /home/pi/pcu && python3 -m pipenv run serve > /home/pi/log.txt
+@reboot cd /home/pi/pcu && python3 -m pipenv run logger > /home/pi/log.txt
+```
+
+Add ethernet bridge boot commands at the end of /etc/network/interfaces
+
+```
+auto br0
+iface br0 inet dhcp
+bridge_ports eth0 eth1
+```
+
+
+## Interface
+TODO
+
+description
+
+image
+
+## API
+
+TODO
+
+description/commands
+
+## Hardware
+TODO
+description/list

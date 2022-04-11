@@ -13,8 +13,6 @@ db_client = DatabaseClient(database_type.port)
 ports_repo = PortsRepository(db_client)
 ports_service = PortsService(ports_repo)
 
-# TODO handle errors
-
 
 @bp.route('/<int:port_id>/state', methods=['GET'])
 def get_port_state(port_id):

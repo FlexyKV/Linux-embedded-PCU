@@ -1,17 +1,11 @@
 from datetime import datetime
-
 import Adafruit_GPIO.GPIO as GPIO
 import Adafruit_GPIO.SPI as SPI
 import time
 import math
-import threading
-import numpy as np
 
 
-
-#Classe MCP3008 permettant d'instancier un objet ADC
-# from src.repository.adc.adc_repository import AdcRepository
-# from src.repository.database_client.database_client import DatabaseClient
+# Classe MCP3008 permettant d'instancier un objet ADC
 
 class MCP3008(object):
     """Class to represent an Adafruit MCP3008 analog to digital converter.
@@ -52,7 +46,7 @@ class MCP3008(object):
         return result & 0x3FF
 
 
-#Fonction permettant d'initialiser le port SPI et les ADC
+# Fonction permettant d'initialiser le port SPI et les ADC
 def ADC_setup():
     SPI_PORT   = 0
     SPI_DEVICE_0 = 0
@@ -60,11 +54,10 @@ def ADC_setup():
     mcp0 = MCP3008(spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE_0))
     mcp1 = MCP3008(spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE_1))
     adc_port = [mcp0, mcp1]
-    ports_states = [1, 1, 1, 1, 1, 1, 1, 1]
     return adc_port
 
 
-#Fonction permettant de faire différent debug selon le niveau d'abstraction (branchement, lecture, encodage, etc..)
+# Fonction permettant de faire différent debug selon le niveau d'abstraction (branchement, lecture, encodage, etc..)
 def calculate_read(adc_port, adc_repo, voltage_ref):
     voltage_list = []
     current_list0 = []
@@ -75,7 +68,6 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
     current_list5 = []
     current_list6 = []
     current_list7 = []
-    ports_states = [1, 1, 1, 1, 1, 1, 1, 1]
 
     squareroot2 = math.sqrt(2)                      # Squareroot of 2 to get peak value
     raspberrypi_vdd = voltage_ref                   # Vdd output from the RPi (Has to be confirm if values are not precise)
@@ -100,12 +92,11 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
 
     sampling_period = 1.0                           # Sampling period in secondes
 
-
-    def conv_factor_current(adc_data,voltage_ref):
+    def conv_factor_current(adc_data, v_ref):
         if adc_data < 4:                            # Eliminate noise at start of ADC_READ
             retVal = 0
         else:
-            retVal = (adc_data - voltage_ref) * squareroot2
+            retVal = (adc_data - v_ref) * squareroot2
         return retVal
 
     def calculate_current(current_list, currentConv):
@@ -116,19 +107,10 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
         ret_val = math.sqrt(sum(temp_data)/size_list)
         return ret_val
 
-    def calculate_powerdraw(voltage_list, current_list, powerConv):
+    def calculate_powerdraw(v_list, current_list, powerConv):
         temp_data = []
-        for i in range(len(voltage_list)):
-            temp_data.append((current_list[i] * powerConv) * voltage_list[i])
-        #     print(temp_data[i])
-        #
-        # print("VOLTAGE---------------------------------")
-        # for i in range(len(voltage_list)):
-        #     print(voltage_list[i])
-        #
-        # print("CURRENT---------------------------------")
-        # for i in range(len(current_list)):
-        #     print(current_list[i])
+        for i in range(len(v_list)):
+            temp_data.append((current_list[i] * powerConv) * v_list[i])
 
         ret_val = sum(temp_data) / len(temp_data)
         if ret_val < 0:
@@ -137,7 +119,7 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
         return ret_val
 
     start_time = time.time()
-    while ((time.time() - start_time)<= sampling_period):
+    while (time.time() - start_time) <= sampling_period:
 
         voltage_ref = (adc_port[1].read_adc(1))
 
@@ -162,8 +144,6 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
     powerdraw6 = abs(calculate_powerdraw(voltage_list, current_list6, current_PowerCal_factor_port6))
     powerdraw7 = abs(calculate_powerdraw(voltage_list, current_list7, current_PowerCal_factor_port7))
 
-    sampling_freq = len(voltage_list)/sampling_period
-
     voltage_rms = max(voltage_list) / squareroot2
 
     current0 = calculate_current(current_list0, current_conv_factor_port0)
@@ -175,59 +155,13 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
     current6 = calculate_current(current_list6, current_conv_factor_port6)
     current7 = calculate_current(current_list7, current_conv_factor_port7)
 
-    # currents_list = [(max(current_list0) / squareroot2)*ports_states[0], (max(current_list1) / squareroot2)*ports_states[1],
-    #                  (max(current_list2) / squareroot2)*ports_states[2], (max(current_list3) / squareroot2)*ports_states[3],
-    #                  (max(current_list4) / squareroot2)*ports_states[4], (max(current_list5) / squareroot2)*ports_states[5],
-    #                  (max(current_list6) / squareroot2)*ports_states[6], (max(current_list7) / squareroot2)*ports_states[7]]
+    currents_list = [current0, current1, current2, current3, current4, current5,current6, current7]
 
-    currents_list = [current0 * ports_states[0], current1 * ports_states[1], current2 * ports_states[2],
-                     current3 * ports_states[3], current4 * ports_states[4], current5 * ports_states[5],
-                     current6 * ports_states[6], current7 * ports_states[7]]
-
-    powerdraw_list = [powerdraw0*ports_states[0], powerdraw1*ports_states[1], powerdraw2*ports_states[2],
-                      powerdraw3*ports_states[3], powerdraw4*ports_states[4], powerdraw5*ports_states[5],
-                      powerdraw6*ports_states[6], powerdraw7*ports_states[7]]
+    powerdraw_list = [powerdraw0, powerdraw1, powerdraw2, powerdraw3, powerdraw4, powerdraw5, powerdraw6, powerdraw7]
 
     adc_repo.insert_port_measures(datetime.now(), currents_list, voltage_rms, powerdraw_list)
 
 
-    # print("Frequency %3.2f Hz - SamplingFreq %3.2f Hz" % (signal_freq, sampling_freq))
-    print("Port 0 : Powerdraw %4.2f W - Current %3.2f A - Voltage %3.2f V" % (powerdraw0*ports_states[0], current0*ports_states[0], voltage_rms))
-    print("Port 1 : Powerdraw %4.2f W - Current %3.2f A - Voltage %3.2f V" % (powerdraw1*ports_states[1], current1*ports_states[1], voltage_rms))
-    print("Port 2 : Powerdraw %4.2f W - Current %3.2f A - Voltage %3.2f V" % (powerdraw2*ports_states[2], current2*ports_states[2], voltage_rms))
-    print("Port 3 : Powerdraw %4.2f W - Current %3.2f A - Voltage %3.2f V" % (powerdraw3*ports_states[3], current3*ports_states[3], voltage_rms))
-    print("Port 4 : Powerdraw %4.2f W - Current %3.2f A - Voltage %3.2f V" % (powerdraw4*ports_states[4], current4*ports_states[4], voltage_rms))
-    print("Port 5 : Powerdraw %4.2f W - Current %3.2f A - Voltage %3.2f V" % (powerdraw5*ports_states[5], current5*ports_states[5], voltage_rms))
-    print("Port 6 : Powerdraw %4.2f W - Current %3.2f A - Voltage %3.2f V" % (powerdraw6*ports_states[6], current6*ports_states[6], voltage_rms))
-    print("Port 7 : Powerdraw %4.2f W - Current %3.2f A - Voltage %3.2f V" % (powerdraw7*ports_states[7], current7*ports_states[7], voltage_rms))
-    print("----------------------------------------------------------------")
-
-
-    # print("VOLTAGE ----------------------------")
-    # for i in range(len(powerdraw0)):
-    #     print(powerdraw0[i])
-
-    # print("CURRENT ----------------------------")
-    # for i in range(len(current_list1)):
-    #     adc_port[0].read_adc(1)
-    #
-    # print("CURRENT MAX")
-    # print(max(test_list) / squareroot2)
-
-    # ret_val = sum(current_list0)/len(current_list0)
-    # print(max(current_list0))
-    #
-    # print(sum(voltage_list))
-    # print(len(voltage_list))
-
-
-
-
-def get_data_API():
-    pass
-
-    # calculate_thread = threading.Thread(target=calculate_read, args=(v_inst_moy, I_inst_moy, P_inst_moy, adc_port))
-    # calculate_thread.start()
 
 
 

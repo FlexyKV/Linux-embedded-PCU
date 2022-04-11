@@ -1,8 +1,8 @@
 import json
 from flask import Blueprint, make_response
 from flask_cors import CORS
-from src.config.config import set_login_password, get_login_password
-from src.web.api.login_validation.login_validation import validate_access, algo_encryption, verify_token
+from src.config.config import get_login_password
+from src.web.api.login_validation.login_validation import validate_access, algo_encryption
 import jwt
 import datetime
 

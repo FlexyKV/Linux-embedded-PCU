@@ -4,6 +4,7 @@ from web.ports.pcu_ports import gpio_toggle_ON, gpio_toggle_OFF, gpio_setup
 
 
 port_db_client = DatabaseClient(database_type.port)
+port_db_client.initialise_db()
 port_repo = PortsRepository(port_db_client)
 gpio_setup()
 
