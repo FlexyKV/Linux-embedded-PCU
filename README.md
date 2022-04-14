@@ -52,6 +52,31 @@ Install bridge-utils
 sudo apt-get install bridge-utils
 ```
 
+### Mount a RAM partition
+
+Create the temporary directory for the RAM Disk
+```
+mkdir /var/tmp
+```
+
+Edit the fstab file using your favourite editor (e.g. nano)
+
+```
+sudo nano /etc/fstab
+```
+
+Add the following line to /etc/fstab to create a 400MB RAM Disk
+
+```
+tmpfs /var/tmp tmpfs nodev,nosuid,size=400M 0 0
+```
+
+Execute the following command to mount the newly created RAM Disk
+
+```
+sudo mount -a
+```
+
 ### Sync PCU files
 
 Clone Linux-embedded repository and copy files (here using SSH)
@@ -82,10 +107,10 @@ crontab -e
 Add commands at the end of the cron file and save
 
 ```
-@reboot cd /home/pi/pcu && python3 -m pipenv run db_init > /home/pi/log.txt
-@reboot cd /home/pi/pcu && python3 -m pipenv run adc > /home/pi/log.txt
-@reboot cd /home/pi/pcu && python3 -m pipenv run serve > /home/pi/log.txt
-@reboot cd /home/pi/pcu && python3 -m pipenv run logger > /home/pi/log.txt
+@reboot cd /home/pi/pcu && python3 -m pipenv run init_gpio > /home/pi/gpio_log.txt
+@reboot cd /home/pi/pcu && python3 -m pipenv run adc > /home/pi/adc_log.txt
+@reboot cd /home/pi/pcu && python3 -m pipenv run serve > /home/pi/serve_log.txt
+@reboot cd /home/pi/pcu && python3 -m pipenv run logger > /home/pi/logger_log.txt
 ```
 
 Add ethernet bridge boot commands at the end of /etc/network/interfaces
@@ -111,5 +136,6 @@ TODO
 description/commands
 
 ## Hardware
+
 TODO
 description/list

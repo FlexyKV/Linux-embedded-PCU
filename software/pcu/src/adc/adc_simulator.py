@@ -1,5 +1,6 @@
 import configparser
 import random
+from datetime import datetime
 from time import sleep, time
 
 CONFIG_FILE_PATH = "/home/pi/pcu/src/config/config.ini"
@@ -29,7 +30,7 @@ class ADCSimulator:
         for value in range(8):
             current_adc.append(random.uniform(3, 5))
             power_adc.append(random.uniform(5, 8))
-        current_time = time()
+        current_time = datetime.fromtimestamp(time())
         self.repository.insert_port_measures(current_time, current_adc, voltage_adc, power_adc)
 
     def launch_simulation(self):
