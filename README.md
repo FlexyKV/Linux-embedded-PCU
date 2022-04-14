@@ -1,4 +1,4 @@
-# Linux-embeded-PCU
+-r# Linux-embeded-PCU
 Open Source Linux embedder power control unit with python API
 
 ## Software

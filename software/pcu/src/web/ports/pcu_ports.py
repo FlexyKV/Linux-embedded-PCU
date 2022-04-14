@@ -106,7 +106,7 @@ def gpio_test_function():
     gpio.setwarnings(False)
     gpio_setup()
 
-    gpio_toggle_ON(5)
+    gpio_toggle_OFF(4)
 
 
     print("success !!")
