@@ -1,5 +1,6 @@
 from datetime import datetime
-from src.repository.database_client.database_client import DatabaseClient
+from ..database_client.database_client import DatabaseClient
+
 
 
 class RecordRepository:

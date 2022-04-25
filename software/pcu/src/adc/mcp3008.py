@@ -71,24 +71,24 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
 
     squareroot2 = math.sqrt(2)                      # Squareroot of 2 to get peak value
     raspberrypi_vdd = voltage_ref                   # Vdd output from the RPi (Has to be confirm if values are not precise)
-    voltage_conv_factor = 66.9  # Conversion factor to get V(peak)
-    current_conv_factor_port0 = 0.02674548 * 1.018053133654734 * 1.059553084571795 * squareroot2  # Conversion factor to get I(peak) (Due tu resistance precision, every port has to be configure differently)
-    current_conv_factor_port1 = 0.02674548 * 1.018053133654734 * 1.059553084571795 * squareroot2
-    current_conv_factor_port2 = 0.02640527 * 1.018053133654734 * 1.059553084571795 * squareroot2
-    current_conv_factor_port3 = 0.02651524 * 1.018053133654734 * 1.059553084571795 * squareroot2
-    current_conv_factor_port4 = 0.02637314 * 1.018053133654734 * 1.059553084571795 * squareroot2
-    current_conv_factor_port5 = 0.02669338 * 1.018053133654734 * 1.059553084571795 * squareroot2
-    current_conv_factor_port6 = 0.02645705 * 1.018053133654734 * 1.059553084571795 * squareroot2
-    current_conv_factor_port7 = 0.01645705 * squareroot2  # Pince de 20A qui sera changé dans le futur
+    voltage_conv_factor = 67  # Conversion factor to get V(peak)
+    current_conv_factor_port0 = 0.028840173 * squareroot2  # Conversion factor to get I(peak) (Due tu resistance precision, every port has to be configure differently)
+    current_conv_factor_port1 = 0.028552811 * squareroot2
+    current_conv_factor_port2 = 0.0288662513 * squareroot2
+    current_conv_factor_port3 = 0.028663481 * squareroot2
+    current_conv_factor_port4 = 0.02855166 * squareroot2
+    current_conv_factor_port5 = 0.02884985015 * squareroot2
+    current_conv_factor_port6 = 0.028224279 * squareroot2
+    current_conv_factor_port7 = 0.020484626 * squareroot2  # Pince de 20A qui sera changé dans le futur
 
-    current_PowerCal_factor_port0 = 0.0284099 * 1.421461196567192 # Conversion factor to get I(peak) (Due tu resistance precision, every port has to be configure differently)
-    current_PowerCal_factor_port1 = 0.0284099 * 1.421461196567192 * 1.012820512820513 / 1.018801479257642
-    current_PowerCal_factor_port2 = 0.0298088 * 1.421461196567192
-    current_PowerCal_factor_port3 = 0.0301245 * 1.421461196567192
-    current_PowerCal_factor_port4 = 0.0303976 * 1.421461196567192
-    current_PowerCal_factor_port5 = 0.0308991 * 1.421461196567192
-    current_PowerCal_factor_port6 = 0.0309091 * 1.421461196567192
-    current_PowerCal_factor_port7 = 0.0284099 * 1.421461196567192
+    current_PowerCal_factor_port0 = 0.04038357044  # Conversion factor to get I(peak) (Due tu resistance precision, every port has to be configure differently)
+    current_PowerCal_factor_port1 = 0.04014649503
+    current_PowerCal_factor_port2 = 0.040416841
+    current_PowerCal_factor_port3 = 0.040462253
+    current_PowerCal_factor_port4 = 0.040599104
+    current_PowerCal_factor_port5 = 0.041873727
+    current_PowerCal_factor_port6 = 0.040877261
+    current_PowerCal_factor_port7 = 0.031791492
 
     sampling_period = 1.0                           # Sampling period in secondes
 
