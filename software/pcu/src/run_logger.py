@@ -28,7 +28,7 @@ hours = 0
 start_time = time.time()
 
 while True:
-    if (time.time() - start_time) < 3600:  # 3600 for hour
+    if (time.time() - start_time) < 3600:  # 3600 second for hour
         time.sleep(1)
         continue
     start_time = time.time()

@@ -101,17 +101,3 @@ def Port_stress_test():
     sleep(0.5)
     gpio_toggle_OFF(1)
 
-
-def gpio_test_function():
-    gpio.setwarnings(False)
-    gpio_setup()
-
-    gpio_toggle_ON(5)
-
-
-    print("success !!")
-
-
-
-if __name__ == "__main__":
-    gpio_test_function()

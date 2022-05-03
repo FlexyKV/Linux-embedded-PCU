@@ -10,6 +10,7 @@ class AdcRepository:
         self.port_db = port_db
 
     def insert_port_measures(self, record_datetime: datetime, current: list, voltage: int, power: list):
+        """ insert port measures and state in database"""
         with self.port_db as port_cur:
             port_states = self.__get_port_states(port_cur)
         with self.record_db as record_cur:

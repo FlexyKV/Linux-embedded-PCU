@@ -8,6 +8,7 @@ class RecordService:
         self.repository = repository
 
     def get_port_records(self, port_id: int, start_time: str, end_time: str, period: int):
+        """get record data for port_id from start_time to end_time for every period"""
         port_records = self.repository.get_port_records(port_id, str_to_datetime(start_time), str_to_datetime(end_time))
         if port_records == -1:
             return json.dumps({"error": "no data"})
@@ -16,6 +17,7 @@ class RecordService:
         return parse_records_to_json(mapped_port_records)
 
     def get_instant_record(self):
+        """get last record data and port state for all ports"""
         instant_measures = self.repository.get_instant_record()
         if instant_measures == -1:
             return json.dumps({"error": "no data"})

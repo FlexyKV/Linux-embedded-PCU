@@ -12,6 +12,7 @@ CORS(bp)
 
 @bp.route('/<password>', methods=['GET'])
 def login(password):
+    """verify the login password and return a access token is valid"""
     if validate_access(password):
         token = jwt.encode(
             {'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=10)}, get_login_password(),

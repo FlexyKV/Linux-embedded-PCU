@@ -1,8 +1,6 @@
 # Linux-embedded-PCU
 Open Source Linux embedded power control unit with python API and UI for convivial control and monitoring.
 
-## Description
-TODO
 ## Installation
 
 ### OS
@@ -29,6 +27,8 @@ sudo raspi-config
 In system options, set a new password, and a desired PCU hostname
 
 In interface options, enable SPI and SSH
+
+change localisation to get local system time
 
 Reboot system
 
@@ -120,25 +120,3 @@ auto br0
 iface br0 inet dhcp
 bridge_ports eth0 eth1
 ```
-
-
-## Interface
-TODO
-
-description
-
-image
-
-## API
-
-TODO
-
-description/commands
-
-## Hardware
-
-TODO
-description/list
-
-
-change time zone

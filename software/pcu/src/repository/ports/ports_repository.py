@@ -6,6 +6,7 @@ class PortsRepository:
         self.db = db
 
     def get_port_state(self, port_id: int):
+        """ get port state from database """
         with self.db as cur:
             get_port_query = """SELECT port_state FROM port WHERE id = ?"""
             cur.execute(get_port_query, [port_id])
@@ -15,6 +16,7 @@ class PortsRepository:
         return port_state[0]
 
     def update_port_state(self, port_id: int, port_state: int):
+        """ update port state in database """
         with self.db as cur:
             put_port_query = """UPDATE port SET port_state = ? WHERE id = ?"""
             cur.execute(put_port_query, [port_state, port_id])
