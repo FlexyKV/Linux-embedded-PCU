@@ -100,4 +100,3 @@ def Port_stress_test():
     gpio_toggle_OFF(1)
     sleep(0.5)
     gpio_toggle_OFF(1)
-

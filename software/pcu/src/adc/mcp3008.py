@@ -68,7 +68,7 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
     current_list5 = []
     current_list6 = []
     current_list7 = []
-
+    
     squareroot2 = math.sqrt(2)                      # Squareroot of 2 to get peak value
     raspberrypi_vdd = voltage_ref                   # Vdd output from the RPi (Has to be confirm if values are not precise)
     voltage_conv_factor = 67  # Conversion factor to get V(peak)
@@ -90,7 +90,7 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
     current_PowerCal_factor_port6 = 0.040877261
     current_PowerCal_factor_port7 = 0.031791492
 
-    sampling_period = 1.0                           # Sampling period in secondes
+    sampling_period = 1.0                         # Sampling period in secondes
 
     def conv_factor_current(adc_data, v_ref):
         if adc_data < 4:                            # Eliminate noise at start of ADC_READ
@@ -111,11 +111,9 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
         temp_data = []
         for i in range(len(v_list)):
             temp_data.append((current_list[i] * powerConv) * v_list[i])
-
         ret_val = sum(temp_data) / len(temp_data)
         if ret_val < 0:
             ret_val = 0
-
         return ret_val
 
     start_time = time.time()
@@ -128,12 +126,14 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
         current_list2.append(conv_factor_current(adc_port[0].read_adc(2), voltage_ref))
         current_list3.append(conv_factor_current(adc_port[0].read_adc(3), voltage_ref))
 
-        voltage_list.append((((adc_port[1].read_adc(0)-510) / 1023) * raspberrypi_vdd) * voltage_conv_factor * squareroot2)
+        voltage_list.append((((adc_port[1].read_adc(0)-voltage_ref) / 1023) * raspberrypi_vdd) * voltage_conv_factor * squareroot2)
 
+        #current_list4.append((adc_port[0].read_adc(4)-voltage_ref))
         current_list4.append(conv_factor_current(adc_port[0].read_adc(4), voltage_ref))
         current_list5.append(conv_factor_current(adc_port[0].read_adc(5), voltage_ref))
         current_list6.append(conv_factor_current(adc_port[0].read_adc(6), voltage_ref))
         current_list7.append(conv_factor_current(adc_port[0].read_adc(7), voltage_ref))
+        #current_list7.append((adc_port[0].read_adc(7)))
 
     powerdraw0 = abs(calculate_powerdraw(voltage_list, current_list0, current_PowerCal_factor_port0))
     powerdraw1 = abs(calculate_powerdraw(voltage_list, current_list1, current_PowerCal_factor_port1))
@@ -160,8 +160,5 @@ def calculate_read(adc_port, adc_repo, voltage_ref):
     powerdraw_list = [powerdraw0, powerdraw1, powerdraw2, powerdraw3, powerdraw4, powerdraw5, powerdraw6, powerdraw7]
 
     adc_repo.insert_port_measures(datetime.now(), currents_list, voltage_rms, powerdraw_list)
-
-
-
 
 
