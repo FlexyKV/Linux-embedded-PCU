@@ -1,85 +1,122 @@
--r# Linux-embeded-PCU
-Open Source Linux embedder power control unit with python API
+# Linux-embedded-PCU
+Open Source Linux embedded power control unit with python API and UI for convivial control and monitoring.
 
-## Software
+## Installation
 
-This project has an independent API that controls the PCU and a linked UI for convivial control and monitoring.
+### OS
 
-### Interface
+Use Raspberry Pi imager to write Raspbian Lite OS on your SD card
 
-description
+Connect Pi to a screen and keyboard
 
-image
+### Raspbian settings
 
-### API
-
-description
-
-image
-
-## Hardware
-
-description
-
-### Raspberry Pi 4B
-
-description
-
-image
-
-### USB Ethernet port
-
-description
-
-image
-
-### How to use project
-
-#### On work computer
-
-Connect ssh:
+Update Raspbian
 
 ```
-ssh pi@pcu.local 
+sudo apt-get update
+sudo apt-get upgrade
 ```
 
-Sync file:
+Go to config:
 
 ```
-scp -prq pcu pi@pcu.local:/home/pi
+sudo raspi-config
 ```
 
-#### On Raspberry Pi
+In system options, set a new password, and a desired PCU hostname
+
+In interface options, enable SPI and SSH
+
+change localisation to get local system time
+
+Reboot system
+
+### Install dependencies
+
+Install pip3
+
+```
+sudo apt-get install python3-pip
+```
 
 Install pipenv:
 
 ```
-sudo apt-get remove pipenv
 pip3 install pipenv
 ```
 
-Install sqlite3:
+Install bridge-utils
 
 ```
-sudo apt-get install sqlite3
+sudo apt-get install bridge-utils
 ```
 
-Run adc:
+### Mount a RAM partition
 
+Create the temporary directory for the RAM Disk
 ```
-python3 -m pipenv run adc
-```
-
-Run server:
-
-```
-python3 -m pipenv run serve
+mkdir /var/tmp
 ```
 
-set launch file permissions (will be launched at boot)
+Edit the fstab file using your favourite editor (e.g. nano)
 
 ```
-chmod +x reset_database.sh run_adc.sh run_serve.sh run_bridge.sh
+sudo nano /etc/fstab
 ```
 
-apt-get install build-essential libssl-dev libffi-dev python3-dev cargo
+Add the following line to /etc/fstab to create a 400MB RAM Disk
+
+```
+tmpfs /var/tmp tmpfs nodev,nosuid,size=400M 0 0
+```
+
+Execute the following command to mount the newly created RAM Disk
+
+```
+sudo mount -a
+```
+
+### Sync PCU files
+
+Clone Linux-embedded repository and copy files (here using SSH)
+
+For Windows use scp:
+
+```
+scp -prq software/pcu pi@{hostname}.local:/home/pi
+```
+
+For linux you can use ssh-copy
+
+### Setup launch
+
+On the Pi, set up the pipenv virtual environment
+
+```
+cd pcu
+python3 -m pipenv install
+```
+
+Use crontab to launch PCU at boot
+
+```
+crontab -e
+```
+
+Add commands at the end of the cron file and save
+
+```
+@reboot cd /home/pi/pcu && python3 -m pipenv run init_gpio > /home/pi/gpio_log.txt
+@reboot cd /home/pi/pcu && python3 -m pipenv run adc > /home/pi/adc_log.txt
+@reboot cd /home/pi/pcu && python3 -m pipenv run serve > /home/pi/serve_log.txt
+@reboot cd /home/pi/pcu && python3 -m pipenv run logger > /home/pi/logger_log.txt
+```
+
+Add ethernet bridge boot commands at the end of /etc/network/interfaces
+
+```
+auto br0
+iface br0 inet dhcp
+bridge_ports eth0 eth1
+```

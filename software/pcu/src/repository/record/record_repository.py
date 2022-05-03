@@ -1,5 +1,6 @@
 from datetime import datetime
-from src.repository.database_client.database_client import DatabaseClient
+from ..database_client.database_client import DatabaseClient
+
 
 
 class RecordRepository:
@@ -7,6 +8,7 @@ class RecordRepository:
         self.db = db
 
     def get_port_records(self, port_id: int, start_time: datetime, end_time: datetime):
+        """get record data in database for port_id from start_time to end_time"""
         with self.db as cur:
             port_data_query = """
             SELECT measure.current, measure.voltage, measure.power, record.record_datetime as "[timestamp]", 
@@ -22,6 +24,7 @@ class RecordRepository:
         return self.__extract_port_record_values(record_data, port_id)
 
     def get_instant_record(self):
+        """get last record data and port state in database for all ports"""
         with self.db as cur:
             instant_data_query = """
             SELECT measure.current, measure.voltage, measure.power, record.record_datetime as "[timestamp]", 

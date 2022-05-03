@@ -44,6 +44,7 @@ def map_measures(record_datetime, record_port_states, measures, return_period):
 
 
 def parse_records_to_json(measures_info: list) -> json:
+    """ format port record data in json """
 
     # measure datetime data
     measures_datetime_dict = {}
@@ -66,6 +67,7 @@ def parse_records_to_json(measures_info: list) -> json:
 
 
 def parse_instant_record_to_json(record_datetime, record_port_states, measures):
+    """ format instant record data in json """
     instant_measures = {"datetime": datetime_to_str(record_datetime),
                         "port_0": {"port_state": record_port_states[0], "port_current": measures[0][0],
                                    "port_voltage": measures[0][1], "port_power": measures[0][2]},

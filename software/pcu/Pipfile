@@ -10,11 +10,10 @@ Adafruit_GPIO = "*"
 gunicorn = "*"
 pyjwt = "*"
 "RPi.GPIO" = "*"
-#numpy = "*"
 
 
 [requires]
-python_version = "3.7"
+python_version = "3"
 
 [scripts]
 serve = "gunicorn -b 0.0.0.0:5000 src:app"

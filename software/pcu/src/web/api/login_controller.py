@@ -1,8 +1,8 @@
 import json
 from flask import Blueprint, make_response
 from flask_cors import CORS
-from src.config.config import set_login_password, get_login_password
-from src.web.api.login_validation.login_validation import validate_access, algo_encryption, verify_token
+from src.config.config import get_login_password
+from src.web.api.login_validation.login_validation import validate_access, algo_encryption
 import jwt
 import datetime
 
@@ -12,6 +12,7 @@ CORS(bp)
 
 @bp.route('/<password>', methods=['GET'])
 def login(password):
+    """verify the login password and return a access token is valid"""
     if validate_access(password):
         token = jwt.encode(
             {'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=10)}, get_login_password(),

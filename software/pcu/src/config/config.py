@@ -62,3 +62,8 @@ def set_log_port(log_server_port):
 def reboot_pcu():
     os.system("sudo reboot &")
     return json.dumps({"status": 200})
+
+
+def get_ip():
+    ip = os.popen("hostname -I | awk '{print $1}'").read()
+    return json.dumps({"status": 200, "ip": ip})

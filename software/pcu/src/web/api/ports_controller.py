@@ -13,16 +13,17 @@ db_client = DatabaseClient(database_type.port)
 ports_repo = PortsRepository(db_client)
 ports_service = PortsService(ports_repo)
 
-# TODO handle errors
-
 
 @bp.route('/<int:port_id>/state', methods=['GET'])
 def get_port_state(port_id):
+    """get the port_id state"""
     return ports_service.get_port_state(port_id)
 
 
 @bp.route('/state', methods=['PUT'])
 @verify_token
 def put_port_state():
+    """modify the port_id state
+    input: json {'port_id': <int>[0->8], 'port_state': <int>[0,1] } """
     payload = json.loads(request.get_data())
     return ports_service.update_port_state(payload["port_id"], payload["port_state"])
