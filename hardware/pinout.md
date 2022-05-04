@@ -46,4 +46,4 @@
 | +          | USB 1 -> ETHERNET 2 |   IN/OUT  | Network Extension   | 
 ## Appendix A: the Raspberry Pi 4B
 
-![Raspberry Pi 3B pinout](GPIO-Pinout-Diagram-2.png "Pinout")
+![Raspberry Pi 4 pinout](GPIO-Pinout-Diagram-2.png "Pinout")
