@@ -1,123 +1,103 @@
-# Linux-embedded-PCU
-Open Source Linux embedded power control unit with python API and UI for convivial control and monitoring.
+# Linux Embedded Power Control Unit (PCU) ⚡
 
-## Installation
+> **University Capstone Project**
+>
+> Open Source Linux embedded power control unit with Python API and UI for convivial control and monitoring.
+# Linux Embedded Power Control Unit (PCU)
 
-### OS
+![Python](https://img.shields.io/badge/Python-3.x-blue.svg) ![Platform](https://img.shields.io/badge/Platform-Raspberry%20Pi-red.svg) ![License](https://img.shields.io/badge/License-Open%20Source-green.svg)
 
-Use Raspberry Pi imager to write Raspbian Lite OS on your SD card
+**Open Source Linux embedded power control unit with Python API.**
 
-Connect Pi to a screen and keyboard
+This project is a comprehensive solution for controlling power outlets and monitoring power consumption via a Raspberry Pi. It features a custom hardware interface, a robust Python backend, and a RESTful API designed for reliability and ease of use in embedded environments.
 
-### Raspbian settings
+## 📋 Features
 
-Update Raspbian
+* **Smart Control**: Independent toggle of 8 relays via GPIO.
+* **Real-time Monitoring**: Voltage, current, and power measurement via MCP3008 ADC.
+* **REST API**: Full programmatic control using Flask and JWT authentication.
+* **System Optimization**: Implements RAM Disk storage for high-frequency logs to prevent SD card corruption.
+* **Automated Services**: Self-healing background services managed via Cron and Pipenv.
 
+---
+
+## 🛠 Installation Guide
+
+Follow these steps to set up the Power Control Unit from a fresh Raspberry Pi installation.
+
+### 1. OS Preparation
+1.  Use **Raspberry Pi Imager** to write **Raspbian Lite OS** on your SD card.
+2.  Connect the Pi to a screen and keyboard for initial setup.
+
+### 2. Raspbian Configuration
+**Update System:**
 ```
-sudo apt-get update
-sudo apt-get upgrade
+sudo apt-get update sudo apt-get upgrade
 ```
-
-Go to config:
-
+**Run the config tool:**
 ```
 sudo raspi-config
 ```
+System Options: Set a new password and the PCU hostname.
 
-In system options, set a new password, and a desired PCU hostname
+Interface Options: Enable SPI and SSH.
 
-In interface options, enable SPI and SSH
+Localisation: Set local system time (critical for logs).
 
-change localisation to get local system time
+Reboot: Restart the system.
 
-Reboot system
-
-### Install dependencies
-
-Install pip3
-
+### 3. Install Dependencies
+**Install Python pip, network utils, and bridge-utils:**
 ```
-sudo apt-get install python3-pip
+sudo apt-get install python3-pip bridge-utils pip3 install pipenv
 ```
+### 4. Mount a RAM Partition (Optimization)
+To prevent SD card wear from frequent log writes, create a temporary RAM disk.
 
-Install pipenv:
-
-```
-pip3 install pipenv
-```
-
-Install bridge-utils
-
-```
-sudo apt-get install bridge-utils
-```
-
-### Mount a RAM partition
-
-Create the temporary directory for the RAM Disk
+**Create directory:**
 ```
 mkdir /var/tmp
 ```
-
-Edit the fstab file using your favourite editor (e.g. nano)
-
+**Edit fstab:**
 ```
 sudo nano /etc/fstab
 ```
-
-Add the following line to /etc/fstab to create a 400MB RAM Disk
-
+**Add this line to the end of the file (400MB RAM Disk):**
 ```
 tmpfs /var/tmp tmpfs nodev,nosuid,size=400M 0 0
 ```
-
-Execute the following command to mount the newly created RAM Disk
-
+**Mount the disk:**
 ```
 sudo mount -a
 ```
+### 5. Sync PCU Files
+**Clone the repository or copy files via SCP.**
 
-### Sync PCU files
-
-Clone Linux-embedded repository and copy files (here using SSH)
-
-For Windows use scp:
-
+For Windows (using SCP):
 ```
+Replace {hostname} with your specific Pi hostname
 scp -prq software/pcu pi@{hostname}.local:/home/pi
 ```
-
-For linux you can use ssh-copy
-
-### Setup launch
-
-On the Pi, set up the pipenv virtual environment
-
+**Setup Python Environment:**
 ```
-cd pcu
-python3 -m pipenv install
+cd pcu python3 -m pipenv install
 ```
-
-Use crontab to launch PCU at boot
-
+### 6. Setup Auto-Launch
+**Use cron to launch PCU services at boot.**
 ```
 crontab -e
 ```
-
-Add commands at the end of the cron file and save
-
+**Add these commands at the end of the file:**
 ```
-@reboot cd /home/pi/pcu && python3 -m pipenv run init_gpio > /home/pi/gpio_log.txt
-@reboot cd /home/pi/pcu && python3 -m pipenv run adc > /home/pi/adc_log.txt
-@reboot cd /home/pi/pcu && python3 -m pipenv run serve > /home/pi/serve_log.txt
-@reboot cd /home/pi/pcu && python3 -m pipenv run logger > /home/pi/logger_log.txt
+@reboot cd /home/pi/pcu && python3 -m pipenv run init_gpio > /home/pi/gpio_log.txt @reboot cd /home/pi/pcu && python3 -m pipenv run adc > /home/pi/adc_log.txt @reboot cd /home/pi/pcu && python3 -m pipenv run serve > /home/pi/serve_log.txt @reboot cd /home/pi/pcu && python3 -m pipenv run logger > /home/pi/logger_log.txt
 ```
-
-Add ethernet bridge boot commands at the end of /etc/network/interfaces
-
+### 7. Network Bridge
+**Add ethernet bridge configuration to the end of /etc/network/interfaces:**
 ```
-auto br0
-iface br0 inet dhcp
-bridge_ports eth0 eth1
+auto br0 iface br0 inet dhcp bridge_ports eth0 eth1
 ```
+🔌 Hardware Documentation
+For pinout tables and PCB schematics, refer to: 👉 [Hardware Pinout](https://www.google.com/search?q=hardware/pinout.md)
 
+📡 API Documentation
+For full API command references (Config, Port control, Records): 👉 [API Documentation](https://www.google.com/search?q=software/API.md)
