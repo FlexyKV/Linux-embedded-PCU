@@ -97,7 +97,7 @@ crontab -e
 auto br0 iface br0 inet dhcp bridge_ports eth0 eth1
 ```
 🔌 Hardware Documentation
-For pinout tables and PCB schematics, refer to: 👉 [Hardware Pinout](https://www.google.com/search?q=hardware/pinout.md)
+For pinout tables and PCB schematics, refer to: 👉 [Hardware Pinout](https://github.com/FlexyKV/Linux-embedded-PCU/blob/main/hardware/pinout.md)
 
 📡 API Documentation
-For full API command references (Config, Port control, Records): 👉 [API Documentation](https://www.google.com/search?q=software/API.md)
+For full API command references (Config, Port control, Records): 👉 [API Documentation](https://github.com/FlexyKV/Linux-embedded-PCU/blob/main/software/API.md)
