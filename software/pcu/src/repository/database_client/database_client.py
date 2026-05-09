@@ -1,8 +1,8 @@
 import configparser
 import enum
 import sqlite3
-from typing import Optional, Type
 from types import TracebackType
+from typing import Optional, Type
 
 PORT_DATABASE_TABLES = r"/home/pi/pcu/sqlite_database/port_database.sql"
 PORT_DATABASE_PATH = r"/home/pi/pcu/sqlite_database/port_database.db"
@@ -27,14 +27,11 @@ class memory_type(enum.Enum):
 def get_record_memory_type():
     config = configparser.ConfigParser()
     config.read(CONFIG_FILE_PATH)
-
-    record_memory_type = memory_type[config["DATABASE"].get("record_memory_type")]
-    return record_memory_type
+    return memory_type[config["DATABASE"].get("record_memory_type")]
 
 
 class DatabaseClient:
     def __init__(self, database):
-        self.disk_db_conn = None
         self.conn = None
         self.cur = None
         if database == database_type.port:
@@ -43,22 +40,25 @@ class DatabaseClient:
         elif database == database_type.record:
             if get_record_memory_type() == memory_type.sd:
                 self.db = ROM_RECORD_DATABASE_PATH
-            elif get_record_memory_type() == memory_type.ram:
+            else:
                 self.db = RAM_RECORD_DATABASE_PATH
             self.tables = RECORD_DATABASE_TABLES
 
     def initialise_db(self):
-        with open(self.tables, 'r') as sql_file:
+        with open(self.tables, "r") as sql_file:
             sql_script = sql_file.read()
         self.open()
         try:
             self.cur.executescript(sql_script)
-        except:
+        except sqlite3.OperationalError:
+            # Tables/triggers already exist on subsequent runs.
             pass
         self.close()
 
     def open(self):
-        self.conn = sqlite3.connect(self.db, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
+        self.conn = sqlite3.connect(
+            self.db, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES
+        )
         self.cur = self.conn.cursor()
 
     def close(self):
@@ -70,8 +70,12 @@ class DatabaseClient:
         self.__enable_foreign_keys()
         return self.cur
 
-    def __exit__(self, exctype: Optional[Type[BaseException]], excinst: Optional[BaseException],
-                 exctb: Optional[TracebackType]):
+    def __exit__(
+        self,
+        exctype: Optional[Type[BaseException]],
+        excinst: Optional[BaseException],
+        exctb: Optional[TracebackType],
+    ):
         if exctype is not None:
             self.conn.rollback()
             self.conn.close()
@@ -79,7 +83,4 @@ class DatabaseClient:
             self.close()
 
     def __enable_foreign_keys(self):
-        query = """
-        PRAGMA foreign_keys=ON
-        """
-        self.cur.execute(query)
+        self.cur.execute("PRAGMA foreign_keys=ON")

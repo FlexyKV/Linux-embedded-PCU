@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+Pipfile.lock
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+gpio_log.txt
+adc_log.txt
+serve_log.txt
+logger_log.txt
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE / editors
+.idea/
+.vscode/
+*.swp
+*.swo

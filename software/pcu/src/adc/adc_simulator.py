@@ -1,17 +1,8 @@
-import configparser
 import random
 from datetime import datetime
 from time import sleep, time
 
-CONFIG_FILE_PATH = "/home/pi/pcu/src/config/config.ini"
-
-#just for test
-def get_reference_voltage():
-    config = configparser.ConfigParser()
-    config.read(CONFIG_FILE_PATH)
-
-    reference_voltage = config["ADC"].getfloat("reference_voltage")
-    return reference_voltage
+NUM_PORTS = 8
 
 
 class ADCSimulator:
@@ -24,14 +15,12 @@ class ADCSimulator:
         print("init done")
 
     def save_measures(self):
-        current_adc = []
         voltage_adc = random.uniform(3, 5)
-        power_adc = []
-        for value in range(8):
-            current_adc.append(random.uniform(3, 5))
-            power_adc.append(random.uniform(5, 8))
-        current_time = datetime.fromtimestamp(time())
-        self.repository.insert_port_measures(current_time, current_adc, voltage_adc, power_adc)
+        current_adc = [random.uniform(3, 5) for _ in range(NUM_PORTS)]
+        power_adc = [random.uniform(5, 8) for _ in range(NUM_PORTS)]
+        self.repository.insert_port_measures(
+            datetime.fromtimestamp(time()), current_adc, voltage_adc, power_adc
+        )
 
     def launch_simulation(self):
         print("launch start")
